@@ -7,6 +7,7 @@ import axios from "axios";
 
 import axiosInstance from "@/src/lib/AxiosInstance";
 
+
 export const getSingleUser = async (id: string) => {
   try {
     const { data } = await axiosInstance.get(`/users/${id}`);
@@ -36,7 +37,7 @@ export const registerUser = async (formData: FormData): Promise<any> => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      },
+      }
     );
 
     if (data.success) {
@@ -54,7 +55,7 @@ export const loginUser = async (userData: FieldValues) => {
   try {
     const { data } = await axios.post(
       `${process.env.NEXT_PUBLIC_BASE_API}/auth/login`,
-      userData,
+      userData
     );
 
     if (data.success) {
@@ -84,7 +85,7 @@ export const verifyProfile = async (): Promise<any> => {
 };
 
 export const followUser = async (
-  userIds: Record<string, unknown>,
+  userIds: Record<string, unknown>
 ): Promise<any> => {
   try {
     const { data } = await axiosInstance.put("/users/follow-users", userIds);
@@ -97,7 +98,7 @@ export const followUser = async (
 
 // unfollw user
 export const unFollowUser = async (
-  userIds: Record<string, unknown>,
+  userIds: Record<string, unknown>
 ): Promise<any> => {
   console.log("userIds", userIds);
   try {
@@ -113,7 +114,7 @@ export const checkFollower = async (ids: Record<string, unknown>) => {
   try {
     const { data } = await axios.post(
       "http://localhost:5000/users/check-follower",
-      ids,
+      ids
     );
 
     return data;
@@ -183,8 +184,23 @@ export const updateMyProfile = async (formData: FormData): Promise<any> => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      },
+      }
     );
+
+    return data;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
+
+export const sendMessage = async (contactInfo: Record<string, unknown>) => {
+  try {
+    const { data } = await axios.post(
+      `${process.env.NEXT_PUBLIC_BASE_API}/contact/send-message`,
+      contactInfo
+    );
+
+
 
     return data;
   } catch (error: any) {

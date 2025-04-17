@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Assuming you add this to your global CSS file */
+.post-content h2 {
+  font-size: 2rem;
+  margin-top: 1.5rem;
+  color: rgb(50, 55, 61);
+}
+
+.post-content p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+
+.post-content a {
+  color: #a0c938; /* Matches your link color */
+  text-decoration: underline;
+}
+
+.post-content a:hover {
+  color: #88a932;
+}
+
+.post-content img {
+  max-width: 100%;
+  margin: 1rem 0;
+  border-radius: 8px;
+}

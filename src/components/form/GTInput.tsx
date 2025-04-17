@@ -24,7 +24,7 @@ export default function GTInput({
   return (
     <Input
       {...register(name)}
-      errorMessage={errors[name] ? (errors[name].message as string) : ""}
+      errorMessage={errors[name] ? (errors[name]?.message as string) : ""}
       id={id}
       isInvalid={!!errors[name]}
       label={label}

@@ -73,7 +73,7 @@ const EditProfile = () => {
       <h1>Edit Profile</h1>
       <GTForm onSubmit={onSubmit}>
         <div className="space-y-4">
-          <div className="flex justify-between items-center p-5 bg-[#262626] rounded-3xl">
+          <div className="flex justify-between items-center p-4 bg-[#EFEFEF] rounded-3xl">
             <div className="flex items-center gap-4">
               <div>
                 <img
@@ -130,7 +130,18 @@ const EditProfile = () => {
           </div>
         </div>
         <div className="text-right">
-          <Button type="submit">Submit</Button>
+          <button
+            type="submit"
+            className="text-white bg-blue-500 px-20 py-3 rounded-xl"
+          >
+            Submit
+          </button>
+          {/* <button
+            type="submit"
+            className="text-black hover:text-white bg-[#E3BE21] py-4 px-20 text-xl md:mx-0 mx-auto block"
+          >
+            Submit
+          </button> */}
         </div>
       </GTForm>
       <Modal isOpen={isOpen} size="xl" onClose={onClose}>

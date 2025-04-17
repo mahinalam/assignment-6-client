@@ -15,16 +15,11 @@ import { useUser } from "@/src/context/user.provider";
 
 export default function NavbarDropdown() {
   const router = useRouter();
-  const pathname = usePathname();
   const { user, setIsLoading: userLoading } = useUser();
 
   const handleLogout = () => {
     logout();
     userLoading(true);
-
-    // if (protectedRoutes.some((route) => pathname.match(route))) {
-    //   router.push("/");
-    // }
   };
 
   const handleNavigation = (pathname: string) => {
@@ -39,9 +34,6 @@ export default function NavbarDropdown() {
       <DropdownMenu aria-label="Static Actions">
         <DropdownItem onClick={() => handleNavigation(`/profile/${user?._id}`)}>
           Profile
-        </DropdownItem>
-        <DropdownItem onClick={() => handleNavigation("/profile/settings")}>
-          Settings
         </DropdownItem>
         <DropdownItem onClick={() => handleNavigation("/profile/create-post")}>
           Create Post

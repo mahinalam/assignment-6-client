@@ -3,7 +3,7 @@
 import axiosInstance from "@/src/lib/AxiosInstance";
 
 export const createComment = async (
-  commentInfo: Record<string, unknown>,
+  commentInfo: Record<string, unknown>
 ): Promise<any> => {
   try {
     const { data } = await axiosInstance.post("/comments", commentInfo);
@@ -25,9 +25,10 @@ export const getAllComments = async (params?: {
 
     // Make the request with the constructed URL
     const { data } = await axiosInstance.get(url);
-
+    console.log("data", data);
     return data;
   } catch (error: any) {
+    console.log(error);
     throw new Error(error);
   }
 };

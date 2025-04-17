@@ -5,7 +5,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
@@ -14,19 +14,30 @@ import GTForm from "@/src/components/form/GTForm";
 import loginValidationSchema from "@/src/schemas/login.schema";
 import GTInput from "@/src/components/form/GTInput";
 import { useUserLogin } from "@/src/hooks/auth.hook";
-import Loading from "@/src/components/UI/Loading";
+import Loading from "@/src/components/UI/LoginLoading";
 import { useUser } from "@/src/context/user.provider";
 
-const LoginPage = () => {
-  const { theme } = useTheme();
+// const LoginPage = () => {
+//   const { theme } = useTheme();
+//   const router = useRouter();
+//   const { setIsLoading: userLoading } = useUser();
 
+//   Wrap with Suspense
+//   return (
+//     <Suspense fallback={<Loading />}>
+//       <LoginPageContent />
+//     </Suspense>
+//   );
+// };
+
+const LoginPageContent = () => {
   const router = useRouter();
   const { setIsLoading: userLoading } = useUser();
 
-  const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect");
+  // const searchParams = useSearchParams();
+  // const redirect = searchParams.get("redirect");
 
-  console.log(redirect);
+  // console.log(redirect);
   const { mutate: handleUserLogin, isPending, isSuccess } = useUserLogin();
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
@@ -36,11 +47,11 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (!isPending && isSuccess) {
-      if (redirect) {
-        router.push(redirect);
-      } else {
-        router.push("/");
-      }
+      // if (redirect) {
+      //   router.push(redirect);
+      // } else {
+      router.push("/");
+      // }
     }
   }, [isPending, isSuccess]);
 
@@ -63,7 +74,7 @@ const LoginPage = () => {
             </div>
 
             <Button
-              className="my-3 w-full rounded-md bg-default-900 font-semibold text-default"
+              className="my-3 w-full rounded-md  font-semibold text-blue-600 bg-transparent"
               size="lg"
               type="submit"
             >
@@ -74,38 +85,9 @@ const LoginPage = () => {
             Don&lsquo;t have account ? <Link href={"/register"}>Register</Link>
           </div>
         </div>
-        <p className="text-center mt-5">Or Sign Up Using</p>
-        <div className="flex justify-center mb-10 mt-2">
-          <button className="btn btn-circle mr-4">
-            <Image
-              alt="google logo"
-              height={50}
-              src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-webinar-optimizing-for-success-google-business-webinar-13.png"
-              width={50}
-            />
-          </button>
-          <button
-            className={`btn btn-circle transition-all rounded-xl ${
-              theme === "dark" ? "bg-gray-800" : "bg-white"
-            } border border-gray-300 hover:border-gray-500`}
-            style={{ padding: "5px" }}
-            onClick={() =>
-              signIn("github", {
-                callbackUrl: "http://localhost:3000",
-              })
-            }
-          >
-            <Image
-              alt="GitHub logo"
-              height={35}
-              src="https://cdn-icons-png.flaticon.com/512/25/25231.png"
-              width={35}
-            />
-          </button>
-        </div>
       </div>
     </>
   );
 };
 
-export default LoginPage;
+export default LoginPageContent;

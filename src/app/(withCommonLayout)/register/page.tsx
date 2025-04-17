@@ -109,8 +109,8 @@ export default function RegisterPage() {
             </div>
           )}
           <Button
-            isLoading={isPending}
             className="my-3 w-full rounded-md bg-default-900 text-default"
+            isLoading={isPending}
             size="lg"
             spinner={
               <svg

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -31,12 +31,6 @@ export const useDeletePost = () => {
   return useMutation<any, Error, any>({
     mutationKey: ["POST"],
     mutationFn: async (id: string) => await deletePost(id),
-    onSuccess: () => {
-      toast.success("Post deleted successfully");
-    },
-    onError: (error) => {
-      // toast.error(error.message);
-    },
   });
 };
 
@@ -89,16 +83,16 @@ export const useUpdateLikeStatus = () => {
     mutationFn: async (data: Record<string, unknown>) =>
       await updateLikeStatus(data),
     onError: (error) => {
-      console.log(error);
       // toast.error(error.message);
     },
   });
 };
 
-export const useGetAllPosts = () => {
+export const useGetAllPosts = (offset?: number, limit?: number) => {
   return useQuery({
     queryKey: ["POST"],
-    queryFn: async () => await getAllGardeningPosts(),
+    queryFn: async () => await getAllGardeningPosts(offset, limit),
+    // enabled: Number(offset) > 10,
   });
 };
 
@@ -111,13 +105,9 @@ export const useGetSinglePost = (id: string) => {
 };
 
 export const useGetUserSavedPosts = (id: string) => {
-  console.log("from hook", !!id);
-
   return useQuery({
     queryKey: ["SAVED_POST"],
     queryFn: async () => {
-      console.log("from fn", id);
-
       return await getUserSavedPostCollection(id);
     },
     enabled: !!id,
@@ -125,10 +115,8 @@ export const useGetUserSavedPosts = (id: string) => {
 };
 
 export const useGetUserPost = (id: string) => {
-  console.log("from hook", id);
-
   return useQuery({
-    queryKey: ["POST", id],
+    queryKey: ["POST"],
     queryFn: async () => await getUserGardeningPost(id),
     enabled: !!id,
   });

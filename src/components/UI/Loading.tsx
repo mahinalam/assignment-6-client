@@ -1,11 +1,16 @@
-"use client";
+import React from "react";
+import { ScaleLoader } from "react-spinners";
 
-import { Spinner } from "@nextui-org/spinner";
-
-export default function Loading() {
+const Loading = ({ isAlign = false }) => {
   return (
-    <div className="h-screen bg-black/10 fixed inset-0 z-[999] backdrop-blur-md flex justify-center items-center">
-      <Spinner size="lg" />
+    <div
+      className={`flex flex-row h-[90vh] w-full  justify-center ${!isAlign ? "items-center" : ""} `}
+    >
+      <div>
+        <ScaleLoader className="w-full h-full" color="green" />
+      </div>
     </div>
   );
-}
+};
+
+export default Loading;

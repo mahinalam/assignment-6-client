@@ -57,7 +57,8 @@ export default function CreatePost() {
       category: data.category,
     };
 
-    console.log(data);
+    console.log(postData);
+
     formData.append("data", JSON.stringify(postData));
     for (let image of imageFiles) {
       formData.append("itemImages", image);
@@ -85,7 +86,7 @@ export default function CreatePost() {
 
   return (
     <div className="md:max-w-[600px] w-full mx-auto">
-      <GTForm resolver={zodResolver(createPostSchema)} onSubmit={onSubmit}>
+      <GTForm onSubmit={onSubmit}>
         {/* Title Field */}
 
         <div>
@@ -119,7 +120,7 @@ export default function CreatePost() {
             className="flex h-14 w-full cursor-pointer items-center justify-center rounded-xl border-2 border-default-200  shadow-sm transition-all duration-100 hover:border-default-400"
             htmlFor="image"
           >
-            <span className=""> Upload image</span>
+            <span className="font-medium"> Upload image</span>
           </label>
           <input
             multiple
@@ -147,8 +148,8 @@ export default function CreatePost() {
         )}
         <Button
           fullWidth
-          className=" border-[1px] bg-black border-green-500 hover:bg-green-500
-          hover:border-[1px] hover:border-black mt-5"
+          className=" border-[1px] bg-transparent hover:border-white hover:text-white hover:bg-green-600 
+         border-white bg-green-600 mt-5"
           isLoading={createPostPending}
           size="lg"
           spinner={

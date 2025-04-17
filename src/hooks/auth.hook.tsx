@@ -57,6 +57,12 @@ export const useVerifyUserProfile = () => {
   return useMutation<any, Error>({
     mutationKey: ["USER"],
     mutationFn: async () => await verifyProfile(),
+
+    onSuccess: (res: any) => {
+      if (res.success) {
+        window.location.href = res.data.payment_url;
+      }
+    },
     // onSuccess: () => {
     //   queryClient.invalidateQueries({ queryKey: ["USER"] });
     //   toast.success(

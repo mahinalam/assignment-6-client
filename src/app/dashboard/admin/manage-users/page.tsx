@@ -17,13 +17,15 @@ import {
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { useDeletePost, useGetAllPosts } from "@/src/hooks/post.hook";
+import { useDeleteUser, useGetAllUsers } from "@/src/hooks/auth.hook";
 
-const ManagePosts = () => {
+const ManageUsers = () => {
   const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, isLoading } = useGetAllPosts();
-  const { mutate: deletePost, isPending, isSuccess } = useDeletePost();
+  const { data, isLoading } = useGetAllUsers();
+
+  console.log(data?.data);
+  const { mutate: deleteUser, isPending, isSuccess } = useDeleteUser();
   const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
 
   // useEffect(() => {
@@ -35,12 +37,10 @@ const ManagePosts = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  const handleDeletePost = () => {
+  //   console.log(isSuccess);
+  const handleDeleteUser = () => {
     if (deleteModalId) {
-      deletePost(deleteModalId);
-      //   if (isSuccess) {
-      queryClient.invalidateQueries({ queryKey: ["POST"] });
+      deleteUser(deleteModalId);
       onClose(); //   }
     }
   };
@@ -50,25 +50,31 @@ const ManagePosts = () => {
   };
 
   return (
-    <>
+    <div className="w-full">
+      <div className="md:my-">
+        <h1 className="text-2xl font-medium md:pl-6 md:my-3">Manage Users</h1>
+      </div>
       <Table aria-label="Example static collection table">
         <TableHeader>
-          <TableColumn>TITLE</TableColumn>
-          <TableColumn>IMAGE </TableColumn>
-          <TableColumn>POST BY</TableColumn>
-          <TableColumn>CATEGORY</TableColumn>
+          <TableColumn>NAME</TableColumn>
+          <TableColumn>EMAIL </TableColumn>
+          <TableColumn>MOBILE NUMBER</TableColumn>
+          <TableColumn>PROFILE PHOTO</TableColumn>
+          <TableColumn>STATUS</TableColumn>
           <TableColumn>ACTION</TableColumn>
         </TableHeader>
         <TableBody>
           {!isLoading &&
             data?.data?.map((item: any) => (
               <TableRow key={item?._id}>
-                <TableCell>{item?.title}</TableCell>
+                <TableCell>{item?.name}</TableCell>
+                <TableCell>{item?.email}</TableCell>
+                <TableCell>{item?.mobileNumber}</TableCell>
                 <TableCell>
-                  <img alt="" className="size-12" src={item?.images[0]} />
+                  <img alt="" className="size-12" src={item?.profilePhoto} />
                 </TableCell>
-                <TableCell>{item?.user?.name}</TableCell>
-                <TableCell>{item?.category?.name}</TableCell>
+
+                <TableCell>{item?.status}</TableCell>
                 <TableCell>
                   <Button onClick={() => handleDeleteModalOpen(item._id)}>
                     Delete
@@ -84,7 +90,7 @@ const ManagePosts = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Delete Post
+                Delete User
               </ModalHeader>
               <ModalBody>
                 <p>Are you sure want to delete this post?</p>
@@ -93,7 +99,7 @@ const ManagePosts = () => {
                 <Button color="danger" variant="light" onPress={onClose}>
                   No
                 </Button>
-                <Button color="primary" onClick={handleDeletePost}>
+                <Button color="primary" onClick={handleDeleteUser}>
                   Yes
                 </Button>
               </ModalFooter>
@@ -101,8 +107,8 @@ const ManagePosts = () => {
           )}
         </ModalContent>
       </Modal>
-    </>
+    </div>
   );
 };
 
-export default ManagePosts;
+export default ManageUsers;

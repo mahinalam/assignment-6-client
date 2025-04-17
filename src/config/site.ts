@@ -1,4 +1,9 @@
+import { useUser } from "../context/user.provider";
+import { getCurrentUser } from "../services/AuthService";
+
 export type SiteConfig = typeof siteConfig;
+
+const user = getCurrentUser();
 
 export const siteConfig = {
   name: "Next.js + NextUI",
@@ -16,10 +21,6 @@ export const siteConfig = {
       label: "Contact Us",
       href: "/contact",
     },
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-    },
   ],
   navMenuItems: [
     {
@@ -33,10 +34,6 @@ export const siteConfig = {
     {
       label: "Contact Us",
       href: "/contact",
-    },
-    {
-      label: "Dashboard",
-      href: "/dashboard",
     },
   ],
   links: {

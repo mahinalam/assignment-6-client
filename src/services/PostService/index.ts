@@ -46,13 +46,13 @@ export const createSavedPost = async (savedPostData: {
   }
 };
 
-export const getAllGardeningPosts = async () => {
+export const getAllGardeningPosts = async (offset?: number, limit?: number) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/gardening-posts`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/gardening-posts?limit=${limit}&skip=${offset}`,
       {
         cache: "no-store",
-      },
+      }
     );
     const data = res.json();
 
@@ -95,12 +95,12 @@ export const getUserGardeningPost = async (id: string) => {
 
 // update post
 export const updatePost = async (
-  updatedPostdata: Record<string, unknown>,
+  updatedPostdata: Record<string, unknown>
 ): Promise<any> => {
   try {
     const { data } = await axiosInstance.put(
       `/gardening-posts/${updatedPostdata.postId}`,
-      updatedPostdata.data,
+      updatedPostdata.data
     );
 
     return data;
@@ -110,13 +110,13 @@ export const updatePost = async (
 };
 
 export const updateLikeStatus = async (
-  likeStatusData: Record<string, unknown>,
+  likeStatusData: Record<string, unknown>
 ): Promise<any> => {
   console.log("likeStatusData", likeStatusData);
   try {
     const { data } = await axiosInstance.patch(
       `/gardening-posts`,
-      likeStatusData,
+      likeStatusData
     );
 
     return data;

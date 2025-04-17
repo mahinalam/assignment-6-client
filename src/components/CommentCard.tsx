@@ -4,6 +4,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import moment from "moment";
 
 const CommentCard = ({ comment }: any) => {
   const { content, user, createdAt, post } = comment;
@@ -30,10 +31,12 @@ const CommentCard = ({ comment }: any) => {
             <div>
               <div className="flex flex-col">
                 <div className="flex gap-2">
-                  <p>{user?.name}</p>
-                  <p>{content}</p>
+                  <p className="font-semibold">{user?.name}</p>
+                  <p className="font-light">{content}</p>
                 </div>
-                <p className="font-extralight">{createdAt}</p>
+                <p className="font-extralight">
+                  {createdAt ? moment(createdAt).format("MMMM D YYYY") : ""}
+                </p>
               </div>
             </div>
           </div>

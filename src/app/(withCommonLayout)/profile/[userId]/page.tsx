@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 "use client";
@@ -28,8 +29,13 @@ import {
 import { useUser } from "@/src/context/user.provider";
 import Container from "@/src/components/Container";
 import FollowerCard from "@/src/components/profile/FolowerCard";
+import Loading from "@/src/components/UI/Loading";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const ProfilePage = ({ params }: { params: { userId: string } }) => {
+  const queryClient = useQueryClient();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [isOwnProfile, setIsOwnProfile] = useState(false);
@@ -41,15 +47,14 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
   console.log("curentUserInfo", curentUserInfo);
 
   const { data: userPostInfo, isLoading: userPostInfoLoading } = useGetUserPost(
-    params?.userId,
+    params?.userId
   );
 
   console.log("userPostInfo", userPostInfo);
-  const { data: savedPostData, savedPostLoading } = useGetUserSavedPosts(
-    curentUserInfo?._id as string,
-  );
+  // const { data: savedPostData, isLoading: savedPostLoading } =
+  //   useGetUserSavedPosts(curentUserInfo?._id as string);
 
-  console.log("savedPostData", savedPostData);
+  // console.log("savedPostData", savedPostData);
 
   const { mutate: followUser, isSuccess: followUserSuccess } = useFollowUser();
 
@@ -97,7 +102,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
     if (
       postCreatorUser?.followers?.length > 0 &&
       postCreatorUser?.followers?.map(
-        (follower: any) => follower === curentUserInfo?._id,
+        (follower: any) => follower === curentUserInfo?._id
       )
     ) {
       setIsFollower(true);
@@ -132,6 +137,8 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
 
   // unfollow user
   const handleUnFollowUser = () => {
+    console.log("cliked");
+    console.log("user id", curentUserInfo?._id);
     if (postCreatorUser?._id && curentUserInfo?._id) {
       unFollowUserHook({
         followingId: postCreatorUser?._id,
@@ -143,22 +150,53 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
     onFollowModalClose();
   };
 
+  // remove follower
+  const removeFollower = (followerId: string) => {
+    // console.log("followerId", followerId);
+    // console.log('user id', curentUserInfo?._id);
+    if (isOwnProfile) {
+      unFollowUserHook(
+        {
+          followingId: curentUserInfo?._id,
+          followerId,
+        },
+        {
+          onSuccess: (res) => {
+            console.log("res", res);
+            if (res?.success) {
+              queryClient.invalidateQueries({ queryKey: ["USER"] });
+              toast.success("Follower removed!");
+              onFollowerModalClose();
+            }
+          },
+          onError: (error) => {
+            toast.error("Something went wrong!");
+            onFollowerModalClose();
+          },
+        }
+      );
+    }
+
+    // setIsFollower(false);
+    // onFollowModalClose();
+  };
+
   // verify profile
   const handleVerifyProfile = () => {
     console.log("verify clicked");
-    verifyProfile(null, {
-      onSuccess: (res: any) => {
-        if (res.success) {
-          window.location.href = res.data.payment_url;
-        }
-      },
-    });
+    verifyProfile();
   };
 
-  if (userPostInfoLoading || userFollowersDataLoading) {
-    return <p>Loading</p>;
-  }
-
+  // if (userPostInfoLoading || userFollowersDataLoading) {
+  //   return (
+  //     <div className="h-[90vh] w-full flex items-center justify-center">
+  //       <Loading />
+  //     </div>
+  //   );
+  // }
+  // if (savedPostLoading) {
+  //   return <Loading />;
+  // }
   // console.log(params?.userId);
   //
 
@@ -348,14 +386,18 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
               <Card>
                 <CardBody>
                   <div className="grid grid-cols-3 gap-5">
-                    {userPostInfo?.data?.map((item: any) => (
-                      <img
-                        key={item._id}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        src={item.images[0]}
-                      />
-                    ))}
+                    {userPostInfo?.data?.length > 0 ? (
+                      userPostInfo?.data?.map((item: any) => (
+                        <img
+                          key={item._id}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          src={item.images[0]}
+                        />
+                      ))
+                    ) : (
+                      <p>You don't have any post yet.</p>
+                    )}
                   </div>
                   {/* //TODO: fix this tab */}
                 </CardBody>
@@ -398,6 +440,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
                 {userFollowersData?.data?.followers?.length > 0 ? (
                   userFollowersData?.data?.followers?.map((item: any) => (
                     <FollowerCard
+                      removeFollower={removeFollower}
                       key={item._id}
                       item={item}
                       status="follower"
@@ -409,14 +452,6 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
                   </p>
                 )}
               </ModalBody>
-              {/* <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onClick={handleVerifyProfile}>
-                  Verify
-                </Button>
-              </ModalFooter> */}
             </>
           )}
         </ModalContent>
