@@ -64,3 +64,13 @@ export const getSingleGardeningPost = async (id: string) => {
     throw new Error(error);
   }
 };
+// check is user verified
+export const isUserVerified = async () => {
+  try {
+    const { data } = await axiosInstance.get(`/payment/isVerified`);
+
+    return data;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};

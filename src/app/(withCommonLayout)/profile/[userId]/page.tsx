@@ -34,6 +34,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const ProfilePage = ({ params }: { params: { userId: string } }) => {
+  console.log({ params });
   const queryClient = useQueryClient();
 
   const { isOpen, onOpen, onClose } = useDisclosure();

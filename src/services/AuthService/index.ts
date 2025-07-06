@@ -7,7 +7,6 @@ import axios from "axios";
 
 import axiosInstance from "@/src/lib/AxiosInstance";
 
-
 export const getSingleUser = async (id: string) => {
   try {
     const { data } = await axiosInstance.get(`/users/${id}`);
@@ -134,14 +133,35 @@ export const deleteUser = async (userId: string): Promise<any> => {
   }
 };
 
-export const getCurrentUser = async () => {
+// export const getCurrentUser = async () => {
+//   const accessToken = cookies().get("accessToken")?.value;
+
+//   let decodedToken = null;
+
+//   if (accessToken) {
+//     decodedToken = await jwtDecode(accessToken);
+
+//     return {
+//       _id: decodedToken._id,
+//       name: decodedToken.name,
+//       email: decodedToken.email,
+//       mobileNumber: decodedToken.mobileNumber,
+//       role: decodedToken.role,
+//       status: decodedToken.status,
+//       profilePhoto: decodedToken.profilePhoto,
+//     };
+//   }
+
+//   return decodedToken;
+// };
+
+export const getCurrentUser = () => {
   const accessToken = cookies().get("accessToken")?.value;
 
-  let decodedToken = null;
+  if (!accessToken) return null;
 
-  if (accessToken) {
-    decodedToken = await jwtDecode(accessToken);
-
+  try {
+    const decodedToken: any = jwtDecode(accessToken); // jwtDecode is synchronous
     return {
       _id: decodedToken._id,
       name: decodedToken.name,
@@ -151,9 +171,9 @@ export const getCurrentUser = async () => {
       status: decodedToken.status,
       profilePhoto: decodedToken.profilePhoto,
     };
+  } catch (err) {
+    return null;
   }
-
-  return decodedToken;
 };
 
 export const getNewAccessToken = async () => {
@@ -199,8 +219,6 @@ export const sendMessage = async (contactInfo: Record<string, unknown>) => {
       `${process.env.NEXT_PUBLIC_BASE_API}/contact/send-message`,
       contactInfo
     );
-
-
 
     return data;
   } catch (error: any) {

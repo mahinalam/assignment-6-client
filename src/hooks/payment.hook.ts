@@ -3,6 +3,7 @@ import {
   deletePayment,
   getAllPayments,
   getAllUserPayments,
+  isUserVerified,
 } from "../services/paymentService";
 
 export const useGetAllPayments = (params?: { userId?: string }) => {
@@ -28,6 +29,16 @@ export const useGetAllUserPayments = (userId: string) => {
       return await getAllUserPayments(userId);
     },
     enabled: !!userId,
+  });
+};
+
+// check is user verified
+export const useIsUserVerified = () => {
+  return useQuery({
+    queryKey: ["PAYMENT"],
+    queryFn: async () => {
+      return await isUserVerified();
+    },
   });
 };
 

@@ -13,18 +13,13 @@ import {
 } from "../services/PostService";
 import { followUser, unFollowUser } from "../services/AuthService";
 import { getSingleGardeningPost } from "../services/CategoryService";
+import { IPost } from "../types";
 // import {getSingle}
 
 export const useCreatePost = () => {
   return useMutation<any, Error, FormData>({
     mutationKey: ["POST"],
     mutationFn: async (postData) => await createPost(postData),
-    onSuccess: () => {
-      toast.success("Post created successfully");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
   });
 };
 export const useDeletePost = () => {
@@ -70,10 +65,7 @@ export const useUnFollowUser = () => {
 export const useUpdatePost = () => {
   return useMutation<any, Error, any>({
     mutationKey: ["POST"],
-    mutationFn: async (data) => await updatePost(data),
-    onError: (error) => {
-      toast.error(error.message);
-    },
+    mutationFn: async (data: Partial<IPost>) => await updatePost(data),
   });
 };
 

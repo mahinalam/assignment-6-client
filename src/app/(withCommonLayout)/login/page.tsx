@@ -61,7 +61,7 @@ const LoginPageContent = () => {
       <div className="flex md:h-[calc(100vh-100px)] h-[calc(100vh-200px)] w-full flex-col items-center justify-center">
         <h3 className="my-2 text-2xl font-bold">Login with GreenHaven</h3>
         <p className="mb-4">Welcome Back! Let&lsquo;s Get Started</p>
-        <div className="md:w-[35%] w-[80%] mx-auto">
+        <div className="w-full mx-auto">
           <GTForm
             resolver={zodResolver(loginValidationSchema)}
             onSubmit={onSubmit}
@@ -72,7 +72,6 @@ const LoginPageContent = () => {
             <div className="py-3">
               <GTInput label="Password" name="password" type="password" />
             </div>
-
             <Button
               className="my-3 w-full rounded-md  font-semibold text-blue-600 bg-transparent"
               size="lg"

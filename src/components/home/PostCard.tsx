@@ -162,6 +162,7 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
 
   return (
     <div className="space-y-2 mt-1 md:w-[80%] w-full mx-auto h-auto">
+      '{" "}
       <Link className="flex items-center" href={`/profile/${user?._id}`}>
         <div>
           <img
@@ -193,7 +194,7 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
 
         {/* <p className="ml-2 font-extralight ">1d</p> */}
       </Link>
-
+      '
       <Link href={`posts/${_id}`}>
         {" "}
         <section className="space-y-3">
@@ -205,12 +206,17 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
           <img alt="" src={images?.[0] || ""} />
         </div>
       </Link>
-
       <div>
         <div className="flex items-center justify-between gap-4 mt-2">
           <div className="flex items-center gap-10 ">
             <svg
-              className={`size-7 ${isOwnDownVote || isOwnUpVote ? (isOwnUpVote ? "text-blue-500 fill-blue-500 cursor-not-allowed" : "cursor-not-allowed") : "cursor-pointer"} `}
+              className={`size-7 ${
+                isOwnDownVote || isOwnUpVote
+                  ? isOwnUpVote
+                    ? "text-[#4CAF50] fill-[#4CAF50] cursor-not-allowed"
+                    : "cursor-not-allowed"
+                  : "cursor-pointer"
+              } `}
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
@@ -232,7 +238,13 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
               onClick={() => handleUpVotes("dislike")}
               stroke="currentColor"
               // className={`size-7 ${isOwnDownVote ? "text-blue-500 cursor-not-allowed" : "cursor-pointer"} `}
-              className={`size-7 ${isOwnDownVote || isOwnUpVote ? (isOwnDownVote ? "text-blue-500 fill-blue-500 cursor-not-allowed" : "cursor-not-allowed") : "cursor-pointer"} `}
+              className={`size-7 ${
+                isOwnDownVote || isOwnUpVote
+                  ? isOwnDownVote
+                    ? "text-blue-500 fill-blue-500 cursor-not-allowed"
+                    : "cursor-not-allowed"
+                  : "cursor-pointer"
+              } `}
             >
               <path
                 d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54"
@@ -243,7 +255,11 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
           </div>
 
           <svg
-            className={`size-7 ${isSavedPost ? "text-red-600 fill-red-600" : "text-gray-500 fill-none"} cursor-pointer transition-colors duration-200 ease-in-out`}
+            className={`size-7 ${
+              isSavedPost
+                ? "text-red-600 fill-red-600"
+                : "text-gray-500 fill-none"
+            } cursor-pointer transition-colors duration-200 ease-in-out`}
             stroke="currentColor"
             strokeWidth="1.5"
             viewBox="0 0 24 24"
@@ -258,7 +274,6 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
           </svg>
         </div>
       </div>
-
       <div className="flex items-center gap-5">
         <div>
           <p className="font-bold">{upVotes?.length} likes</p>
@@ -267,7 +282,6 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
           <p className="font-bold">{downVotes?.length} dislikes</p>
         </div>
       </div>
-
       <div>
         <div className="cursor-pointer font-extralight">
           {allPostComments?.length > 0 ? (
@@ -279,11 +293,10 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
           )}
         </div>
       </div>
-
       <div>
         <div className="">
           {myOwnComments?.length > 0 &&
-            myOwnComments.map((comment: any) => (
+            myOwnComments.slice(0, 1).map((comment: any) => (
               <div
                 key={comment._id}
                 className="flex items-center gap-1 font-bold"
@@ -317,7 +330,6 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
           )}
         </div>
       </form>
-
       {/* Modal */}
       <Modal
         className="mt-16"
@@ -352,7 +364,6 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
           </ModalFooter> */}
         </ModalContent>
       </Modal>
-
       <div>
         <p className="border-b-1 opacity-40" />
       </div>

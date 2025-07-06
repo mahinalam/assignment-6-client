@@ -7,6 +7,8 @@ import { Providers } from "../lib/Providers";
 
 import { siteConfig } from "@/src/config/site";
 import { fontSans } from "@/src/config/fonts";
+import { getCurrentUser } from "../services/AuthService";
+import { redirect } from "next/navigation";
 // import { Providers } from "../redux/Provider";
 
 export const metadata: Metadata = {
@@ -27,7 +29,7 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;

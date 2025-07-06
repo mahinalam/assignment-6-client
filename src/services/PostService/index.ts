@@ -1,6 +1,7 @@
 "use server";
 
 import axiosInstance from "@/src/lib/AxiosInstance";
+import axios from "axios";
 
 export const createPost = async (formData: FormData): Promise<any> => {
   try {
@@ -9,8 +10,6 @@ export const createPost = async (formData: FormData): Promise<any> => {
         "Content-Type": "multipart/form-data",
       },
     });
-
-    // revalidateTag("posts");
 
     return data;
   } catch (error: any) {
@@ -22,8 +21,6 @@ export const createPost = async (formData: FormData): Promise<any> => {
 export const deletePost = async (id: string): Promise<any> => {
   try {
     const { data } = await axiosInstance.delete(`/gardening-posts/${id}`);
-
-    // revalidateTag("posts");
 
     return data;
   } catch (error: any) {
@@ -49,12 +46,11 @@ export const createSavedPost = async (savedPostData: {
 export const getAllGardeningPosts = async (offset?: number, limit?: number) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/gardening-posts?limit=${limit}&skip=${offset}`,
-      {
-        cache: "no-store",
-      }
+      `${process.env.NEXT_PUBLIC_BASE_API}/gardening-posts`,
+      { cache: "no-store" }
     );
-    const data = res.json();
+    const data = await res.json();
+    // console.log({ data });
 
     return data;
   } catch (error: any) {
@@ -68,7 +64,6 @@ export const getUserSavedPostCollection = async (id: string) => {
 
     return data;
   } catch (error: any) {
-    console.log("err", error.message);
     throw new Error(error);
   }
 };
@@ -76,7 +71,7 @@ export const getUserSavedPostCollection = async (id: string) => {
 export const getSingleGardeningPost = async (id: string) => {
   try {
     const { data } = await axiosInstance.get(`/gardening-posts/${id}`);
-
+    console.log({ singlepost: data });
     return data;
   } catch (error: any) {
     throw new Error(error);
@@ -99,8 +94,8 @@ export const updatePost = async (
 ): Promise<any> => {
   try {
     const { data } = await axiosInstance.put(
-      `/gardening-posts/${updatedPostdata.postId}`,
-      updatedPostdata.data
+      `/gardening-posts/`,
+      updatedPostdata
     );
 
     return data;

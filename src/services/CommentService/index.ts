@@ -25,7 +25,6 @@ export const getAllComments = async (params?: {
 
     // Make the request with the constructed URL
     const { data } = await axiosInstance.get(url);
-    console.log("data", data);
     return data;
   } catch (error: any) {
     console.log(error);

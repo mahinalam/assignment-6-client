@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 
 import { useGetAllPosts, useGetSinglePost } from "@/src/hooks/post.hook";
@@ -10,6 +9,7 @@ import RecentPost from "@/src/components/posts/RecentPost";
 
 const PostPage = ({ params }: { params: { postId: string } }) => {
   const { data: singlePost } = useGetSinglePost(params?.postId);
+  console.log({ singlePost });
 
   // const { data: postsData, isLoading } = useGetAllPosts();
   // const singlePost = postsData?.data?.filter(

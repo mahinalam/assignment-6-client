@@ -23,7 +23,6 @@ import { ThemeSwitch } from "../theme-switch";
 
 export const Navbar = () => {
   const { user, isLoading } = useUser();
-
   const router = useRouter();
 
   return (
@@ -85,6 +84,7 @@ export const Navbar = () => {
             <NavbarDropdown />
           </NavbarItem>
         ) : (
+          // <p>Mahin</p>
           <NavbarItem className="hidden sm:flex gap-2">
             <Button onClick={() => router.push("/login")}>Login</Button>
           </NavbarItem>
@@ -104,8 +104,8 @@ export const Navbar = () => {
                   index === 2
                     ? "primary"
                     : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
+                    ? "danger"
+                    : "foreground"
                 }
                 href="#"
                 size="lg"

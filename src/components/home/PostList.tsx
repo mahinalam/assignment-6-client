@@ -46,7 +46,6 @@ import SkeletonLoading from "../UI/SkeletonLoading";
 const NUMBER_OF_POSTS_TO_FETCH = 10;
 
 export default function PostList({ initialPosts }: { initialPosts: any }) {
-  const [posts, setPosts] = useState<any[]>(initialPosts);
   const [offset, setOffset] = useState(NUMBER_OF_POSTS_TO_FETCH);
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const [searchTerm, setSearchTerm] = useState<string>(""); // State for the search term
@@ -58,71 +57,47 @@ export default function PostList({ initialPosts }: { initialPosts: any }) {
   //   console.log("postData", postData);
   const { ref, inView } = useInView();
 
-  const loadMorePosts = async () => {
-    console.log("jdhjdjjdj");
-    const { data } = await refetch();
-    console.log("from refetch", data?.data);
-    const newPosts = data?.data;
+  // const loadMorePosts = async () => {
+  //   console.log("jdhjdjjdj");
+  //   const { data } = await refetch();
+  //   console.log("from refetch", data?.data);
+  //   const newPosts = data?.data;
 
-    if (newPosts && newPosts.length > 0) {
-      setPosts((posts) => [...posts, ...newPosts]);
-      setOffset((offset) => offset + NUMBER_OF_POSTS_TO_FETCH);
+  //   if (newPosts && newPosts.length > 0) {
+  //     setPosts((posts) => [...posts, ...newPosts]);
+  //     setOffset((offset) => offset + NUMBER_OF_POSTS_TO_FETCH);
 
-      // If the number of posts returned is less than the number we requested,
-      // it means we've reached the end.
-      if (newPosts.length < NUMBER_OF_POSTS_TO_FETCH) {
-        setHasMorePosts(false);
-      }
-    } else {
-      // If no posts are returned, set hasMorePosts to false
-      setHasMorePosts(false);
-    }
-  };
+  //     // If the number of posts returned is less than the number we requested,
+  //     // it means we've reached the end.
+  //     if (newPosts.length < NUMBER_OF_POSTS_TO_FETCH) {
+  //       setHasMorePosts(false);
+  //     }
+  //   } else {
+  //     // If no posts are returned, set hasMorePosts to false
+  //     setHasMorePosts(false);
+  //   }
+  // };
 
   // Reset posts and offset if the search term changes
-  useEffect(() => {
-    if (searchTerm) {
-      setPosts([]); // Clear the existing posts
-      setOffset(0); // Reset the offset
-      setHasMorePosts(true); // Reset the hasMorePosts state
-      refetch(); // Refetch posts based on the new search term
-    }
-  }, [searchTerm, refetch]);
+  // useEffect(() => {
+  //   if (searchTerm) {
+  //     setPosts([]); // Clear the existing posts
+  //     setOffset(0); // Reset the offset
+  //     setHasMorePosts(true); // Reset the hasMorePosts state
+  //     refetch(); // Refetch posts based on the new search term
+  //   }
+  // }, [searchTerm, refetch]);
 
-  useEffect(() => {
-    if (inView) {
-      loadMorePosts();
-    }
-  }, [inView]);
+  // useEffect(() => {
+  //   if (inView) {
+  //     loadMorePosts();
+  //   }
+  // }, [inView]);
 
   return (
     <div className="flex flex-col gap-3">
       {/* Search Input */}
-      <Input
-        //   className=""
-        type="text"
-        placeholder="Search posts..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)} // Update the search term on input change
-        className="rounded mb-3 md:w-[30%] md:mr-24 w-full ml-auto placeholder:text-green-600"
-        size="lg"
-        startContent={
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="size-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-            />
-          </svg>
-        }
-      />
+
       {/* {posts?.length > 0 &&
         posts.map((post: any) => <PostCard key={post._id} item={post} />)}
       {hasMorePosts && (
@@ -135,15 +110,10 @@ export default function PostList({ initialPosts }: { initialPosts: any }) {
         <SkeletonLoading />
       ) : (
         <>
-          {posts?.length > 0 &&
-            posts.map((post: any) => (
+          {initialPosts?.length > 0 &&
+            initialPosts.map((post: any) => (
               <PostCard key={post._id} item={post} refetch={refetch} />
             ))}
-          {hasMorePosts && (
-            <div className="mb-5" ref={ref}>
-              <Loading isAlign={false} />
-            </div>
-          )}
         </>
       )}
 

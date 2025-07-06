@@ -28,14 +28,20 @@ export default function NavbarDropdown() {
 
   return (
     <Dropdown>
-      <DropdownTrigger>
-        <Avatar className="cursor-pointer" src={user?.profilePhoto} />
-      </DropdownTrigger>
+      {/* <DropdownTrigger> */}
+      <Avatar className="cursor-pointer" src={user?.profilePhoto} />
+      {/* </DropdownTrigger> */}
       <DropdownMenu aria-label="Static Actions">
-        <DropdownItem onClick={() => handleNavigation(`/profile/${user?._id}`)}>
+        <DropdownItem
+          key={1}
+          // onClick={() => handleNavigation(`/profile/${user?._id}`)}
+        >
           Profile
         </DropdownItem>
-        <DropdownItem onClick={() => handleNavigation("/profile/create-post")}>
+        <DropdownItem
+          key={2}
+          // onClick={() => handleNavigation("/profile/create-post")}
+        >
           Create Post
         </DropdownItem>
         <DropdownItem
