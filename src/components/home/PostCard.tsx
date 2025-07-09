@@ -162,7 +162,7 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
 
   return (
     <div className="space-y-2 mt-1 md:w-[80%] w-full mx-auto h-auto">
-      '{" "}
+      {" "}
       <Link className="flex items-center" href={`/profile/${user?._id}`}>
         <div>
           <img
@@ -194,7 +194,6 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
 
         {/* <p className="ml-2 font-extralight ">1d</p> */}
       </Link>
-      '
       <Link href={`posts/${_id}`}>
         {" "}
         <section className="space-y-3">

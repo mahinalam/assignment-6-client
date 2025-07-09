@@ -88,7 +88,7 @@ const AllPosts = () => {
   };
 
   return (
-    <Container>
+    <div>
       <div className="lg:mb-6 flex justify-between items-center">
         <p className="lg:text-2xl font-bold ">All Posts</p>
         <div className=" ">
@@ -115,8 +115,9 @@ const AllPosts = () => {
         setImageFiles={setCreatePostImageFiles}
         categories={categories}
         postTypeOption={postTypeOption}
+        submitName="Create Post"
       />
-    </Container>
+    </div>
   );
 };
 

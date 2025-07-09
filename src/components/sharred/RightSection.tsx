@@ -55,25 +55,19 @@ const RightSection = () => {
             <>
               <Link
                 className=" text-black -4 py-2 hover:bg-neutral-100 transition font-semibold"
-                href="/"
+                href={`/profile/${user?._id}`}
               >
                 Profile
               </Link>
               <Link
-                href="/"
+                href="/dashboard"
                 className=" text-black -4 py-2 hover:bg-neutral-100 transition font-semibold"
               >
                 Dashboard
               </Link>
-              <Link
-                href="/"
-                className=" text-black -4 py-2 hover:bg-neutral-100 transition font-semibold"
-              >
-                Create Post
-              </Link>
 
               <Link
-                href="/"
+                href="/dashboard/user/wishlist"
                 className=" text-black -4 py-2 hover:bg-neutral-100 transition font-semibold"
               >
                 Saved Post

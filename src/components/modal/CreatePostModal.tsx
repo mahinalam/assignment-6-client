@@ -16,7 +16,8 @@ interface IProps {
   handleCreateProduct: any;
   handleDeleteNewProductImages: any;
   categories: any;
-  postTypeOption: any;
+  postTypeOption?: any;
+  submitName: string;
 }
 
 export default function CreatePostModal({
@@ -28,6 +29,7 @@ export default function CreatePostModal({
   handleDeleteNewProductImages,
   categories,
   postTypeOption,
+  submitName,
 }: IProps) {
   // const categories = categoriesData?.data.map((category: any) => ({
   //   key: category?._id,
@@ -57,7 +59,7 @@ export default function CreatePostModal({
                 <div className=" w-full mx-auto">
                   <div>
                     <h1 className="font-semibold lg:text-2xl lg:my-10">
-                      Create Post
+                      {submitName}
                     </h1>
                   </div>
                   <GTForm onSubmit={handleCreateProduct}>
@@ -78,18 +80,20 @@ export default function CreatePostModal({
                         </div>
                       </div>
                     )}
-                    <div>
-                      <label className="font-bold mb-3" htmlFor="category">
-                        Type
-                      </label>
-                      <div className="py-3">
-                        <GTSelect
-                          label="Type"
-                          name="type"
-                          options={postTypeOption}
-                        />
+                    {postTypeOption?.length > 0 && (
+                      <div>
+                        <label className="font-bold mb-3" htmlFor="category">
+                          Type
+                        </label>
+                        <div className="py-3">
+                          <GTSelect
+                            label="Type"
+                            name="type"
+                            options={postTypeOption}
+                          />
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* <GTInput name="title" label="Title" required /> */}
 
@@ -253,7 +257,7 @@ export default function CreatePostModal({
                       }
                       type="submit"
                     >
-                      Create Post
+                      {submitName}
                     </Button>
                   </GTForm>
                 </div>

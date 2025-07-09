@@ -10,25 +10,17 @@ import { useDeletePost, useUpdatePost } from "@/src/hooks/post.hook";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import EditProductModal from "../modal/EditPostModal";
-import { useGetAllCategories } from "@/src/hooks/category.hook";
+import { SlLike } from "react-icons/sl";
+import { SlDislike } from "react-icons/sl";
+import { FaRegCommentDots } from "react-icons/fa";
 
 const PostCard = ({ post }: { post: IPost }) => {
+  console.log({ post });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const { _id, images, title, content, user } = post;
   const { mutate } = useDeletePost();
   const { mutate: updatePost } = useUpdatePost();
   const queryClient = useQueryClient();
-  const { data: categoriesData, isLoading: categoriesLoading } =
-    useGetAllCategories();
-
-  if (categoriesLoading) {
-    return <p>Loading ...</p>;
-  }
-
-  const categories = categoriesData?.data.map((category: any) => ({
-    key: category?._id,
-    label: category.name,
-  }));
 
   const {
     isOpen: isDeleteModalOpen,
@@ -164,6 +156,26 @@ const PostCard = ({ post }: { post: IPost }) => {
             />
           </div>
         </Link>
+        {/* Footer with Like, Dislike, and Comment */}
+
+        <div className="px-4 pb-4 mt-2">
+          <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <SlLike size={20} />
+                <span className="text-lg">1</span>
+              </div>
+              <div className="flex items-center pl-4 gap-2">
+                <SlDislike size={20} />
+                <span className="text-lg">1</span>
+              </div>
+            </div>
+            <div className="flex items-center pl-4 gap-2">
+              <FaRegCommentDots size={20} />
+              <span className="text-lg">1</span>
+            </div>
+          </div>
+        </div>
       </div>
       <DeleteModal
         handleDeleteProduct={handleDeletePost}
@@ -182,6 +194,8 @@ const PostCard = ({ post }: { post: IPost }) => {
         handleDeleteNewProductImages={handleDeleteImage}
         imageFiles={imageFiles}
         setImageFiles={setImageFiles}
+        modalBtn="Update Post"
+        modalTitle="Update Post"
       />
     </>
   );

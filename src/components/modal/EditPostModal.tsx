@@ -22,6 +22,8 @@ interface IProps {
   handleDeleteNewProductImages: any;
   editProductLoading: boolean;
   defaultValue: IPost;
+  modalTitle: string;
+  modalBtn: string;
 }
 
 export default function EditProductModal({
@@ -33,10 +35,12 @@ export default function EditProductModal({
   handleUpdateProduct,
   handleDeleteNewProductImages,
   defaultValue,
+  modalBtn,
+  modalTitle,
 }: IProps) {
   const { data: categoriesData, isLoading: categoriesDataLoading } =
     useGetAllCategories();
-
+  console.log({ modalTitle });
   if (categoriesDataLoading) {
     return;
   }
@@ -44,6 +48,8 @@ export default function EditProductModal({
     key: item._id,
     label: item.name,
   }));
+
+  console.log("post edit", defaultValue);
 
   // fn for truncate image name
   const truncateFileName = (name: string, front = 6, back = 8) => {
@@ -72,7 +78,7 @@ export default function EditProductModal({
                     <div className="">
                       <div className=" p-5 bg-white">
                         <div>
-                          <p className=" text-[18px] font-bold">Edit Post</p>
+                          <p className=" text-[18px] font-bold">{modalTitle}</p>
                         </div>
                         <GTForm onSubmit={handleUpdateProduct}>
                           <div className="py-3 flex gap-2">
@@ -85,7 +91,7 @@ export default function EditProductModal({
                           </div>
                           <div className="py-3">
                             <GTSelect
-                              defaultSelectedKeys={category._id}
+                              defaultSelectedKeys={category?._id}
                               label="Category"
                               name="category"
                               options={categoriesOption}
@@ -305,7 +311,7 @@ export default function EditProductModal({
                             size="lg"
                             type="submit"
                           >
-                            Update Post
+                            {modalBtn}
                           </Button>
                         </GTForm>
                       </div>

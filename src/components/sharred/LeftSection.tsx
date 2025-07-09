@@ -48,8 +48,8 @@ const LeftSection = () => {
       <NavComponent icon={<IoMdHome size={30} />} address="/" title="Home" />
       <NavComponent
         icon={<MdOutlineTipsAndUpdates size={30} />}
-        title="Guides"
-        address="/"
+        title="Blogs"
+        address="/blogs"
       />
       <NavComponent
         icon={<GoPlus size={30} />}

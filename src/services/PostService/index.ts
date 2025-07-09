@@ -18,6 +18,7 @@ export const createPost = async (formData: FormData): Promise<any> => {
   }
 };
 
+// delete post
 export const deletePost = async (id: string): Promise<any> => {
   try {
     const { data } = await axiosInstance.delete(`/gardening-posts/${id}`);
@@ -25,6 +26,17 @@ export const deletePost = async (id: string): Promise<any> => {
     return data;
   } catch (error: any) {
     console.log(error.message);
+    throw new Error(error.message);
+  }
+};
+
+// delete saved post
+export const deleteSavedPost = async (id: string): Promise<any> => {
+  try {
+    const { data } = await axiosInstance.delete(`/wishlist/${id}`);
+
+    return data;
+  } catch (error: any) {
     throw new Error(error.message);
   }
 };
@@ -59,8 +71,9 @@ export const getAllGardeningPosts = async (offset?: number, limit?: number) => {
 };
 
 export const getUserSavedPostCollection = async (id: string) => {
+  console.log("from hook", id);
   try {
-    const { data } = await axiosInstance.get(`/saved-post?user=${id}}`);
+    const { data } = await axiosInstance.get(`/wishlist?user=${id}`);
 
     return data;
   } catch (error: any) {

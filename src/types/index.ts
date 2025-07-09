@@ -71,3 +71,46 @@ export interface ICategory {
   updatedAt: string;
   __v?: number;
 }
+
+export interface IBlog {
+  _id: string;
+  author: string;
+  category: string;
+  title: string;
+  content: string;
+  images: string[];
+  status: "pending" | "approved" | "rejected";
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+}
+
+export interface IWishlistItem {
+  _id: string;
+  isDeleted: boolean;
+  createdAt: string; // or Date if you parse it
+  updatedAt: string; // or Date
+  user: {
+    _id: string;
+    name: string;
+    role: "USER" | "ADMIN" | string;
+    email: string;
+    followers: string[]; // or User[] if you have user refs
+    // Add any additional user fields you need
+  };
+  post: {
+    _id: string;
+    user: string;
+    title: string;
+    content: string;
+    category: string;
+    images: string[]; // assuming images is an array
+    status: string; // e.g., "approved"
+    isDeleted: boolean;
+    createdAt: string;
+    updatedAt: string;
+    // Add any additional post fields you need
+  };
+  __v: number;
+}

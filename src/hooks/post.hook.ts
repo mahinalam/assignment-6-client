@@ -5,6 +5,7 @@ import {
   createPost,
   createSavedPost,
   deletePost,
+  deleteSavedPost,
   getAllGardeningPosts,
   getUserGardeningPost,
   getUserSavedPostCollection,
@@ -31,13 +32,21 @@ export const useDeletePost = () => {
 
 export const useCreateSavedPost = () => {
   return useMutation<any, Error, any>({
-    mutationKey: ["SAVED_POST"],
+    mutationKey: ["WISHLIST"],
     mutationFn: async (data: { user: string; post: string }) =>
       await createSavedPost(data),
 
     onError: (error) => {
       console.log(error);
     },
+  });
+};
+
+// delete saved post
+export const useDeleteSavedPost = () => {
+  return useMutation<any, Error, any>({
+    mutationKey: ["WISHLIST"],
+    mutationFn: async (id: string) => await deleteSavedPost(id),
   });
 };
 
@@ -98,7 +107,7 @@ export const useGetSinglePost = (id: string) => {
 
 export const useGetUserSavedPosts = (id: string) => {
   return useQuery({
-    queryKey: ["SAVED_POST"],
+    queryKey: ["WISHLIST"],
     queryFn: async () => {
       return await getUserSavedPostCollection(id);
     },
