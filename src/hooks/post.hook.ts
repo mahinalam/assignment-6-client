@@ -105,13 +105,13 @@ export const useGetSinglePost = (id: string) => {
   });
 };
 
-export const useGetUserSavedPosts = (id: string) => {
+export const useGetUserSavedPosts = (id: string, postId: string) => {
   return useQuery({
-    queryKey: ["WISHLIST"],
+    queryKey: ["WISHLIST", id, postId],
     queryFn: async () => {
-      return await getUserSavedPostCollection(id);
+      return await getUserSavedPostCollection(id, postId);
     },
-    enabled: !!id,
+    enabled: !!id && !!postId,
   });
 };
 

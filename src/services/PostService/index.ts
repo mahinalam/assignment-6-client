@@ -70,10 +70,15 @@ export const getAllGardeningPosts = async (offset?: number, limit?: number) => {
   }
 };
 
-export const getUserSavedPostCollection = async (id: string) => {
+export const getUserSavedPostCollection = async (
+  id: string,
+  postId: string
+) => {
   console.log("from hook", id);
   try {
-    const { data } = await axiosInstance.get(`/wishlist?user=${id}`);
+    const { data } = await axiosInstance.get(
+      `/wishlist?user=${id}&post=${postId}`
+    );
 
     return data;
   } catch (error: any) {

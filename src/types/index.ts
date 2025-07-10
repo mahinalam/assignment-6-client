@@ -114,3 +114,8 @@ export interface IWishlistItem {
   };
   __v: number;
 }
+
+export type TQueryParam = {
+  name: string;
+  value: boolean | React.Key;
+};

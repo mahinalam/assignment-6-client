@@ -1,105 +1,63 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "@nextui-org/react";
+import React, { useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
 import { Input } from "@nextui-org/input";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import SkeletonLoading from "../UI/SkeletonLoading";
 import CommentCard from "../CommentCard";
-
 import { useCreateComment, useGetAllComments } from "@/src/hooks/comment.hook";
 import { useUser } from "@/src/context/user.provider";
 import {
   useCreateSavedPost,
-  useUpdateLikeStatus,
-  useUpdatePost,
+  useGetUserSavedPosts,
 } from "@/src/hooks/post.hook";
+import { useCreateReact, useGetPostReacts } from "@/src/hooks/react.hook";
+import { IUser } from "@/src/types";
 
 const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
   const queryClient = useQueryClient();
   const { _id, images, votes, user, upVotes, downVotes, title } = item;
-  console.log({ item });
-
-  const { user: currentUserData } = useUser();
-  console.log("currentUserData", currentUserData);
-
-  // const [myOwnComments, setIsMyOwnComments] = useState<any>(null);
-  // const [totalLikes, setTotalLikes] = useState(votes);
-  const [isOwnUpVote, setIsOwnUpVote] = useState(false);
-  const [isOwnDownVote, setIsOwnDownVote] = useState(false);
   const [isSavedPost, setIsSavedPost] = useState(false);
 
   // const [isOwnUpVotes, setIs]
   const [comment, setComment] = useState("");
   // const [isLikedButtonCliked, setIsLikeButtonCliked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
-
-  const { mutate: handleUpdatePost } = useUpdatePost();
-
   const { mutate: handleCreateComment, isPending: createCommentPending } =
     useCreateComment();
   const { mutate: handleCreateSavedPost, isPending: createSavedPostPending } =
     useCreateSavedPost();
 
-  const { mutate: likeStatus } = useUpdateLikeStatus();
+  const { mutate: createReact } = useCreateReact();
 
   const { user: currentUserInfo } = useUser();
 
-  const {
-    data: commentsData,
-    isLoading: commentsDataLoading,
-    isError,
-    error,
-    isSuccess,
-  } = useGetAllComments();
-  // console.log("commentsData", commentsData);
-  // console.log("isSuccess", isSuccess);
-  // console.log({ isError });
-  // console.log({ error });
+  const { data: commentsData, isLoading: commentsDataLoading } =
+    useGetAllComments();
+  const { data: reactData, isLoading } = useGetPostReacts(_id);
+
+  const { data: userSavedPosts, isLoading: savedPostLoading } =
+    useGetUserSavedPosts((currentUserInfo as IUser)?._id, _id);
+
   const allPostComments = commentsData?.data?.filter(
     (item: any) => item?.post?._id == _id
   );
-  // console.log("allPostComments", allPostComments);
   const myOwnComments =
     allPostComments?.length > 0 &&
     allPostComments.filter(
       (item: any) => item?.user?._id === currentUserInfo?._id
     );
 
-  useEffect(() => {
-    const upVoteMatches = upVotes?.filter(
-      (vote: string) => vote === currentUserInfo?._id
-    );
-    const downVoteMatches = downVotes?.filter(
-      (vote: string) => vote === currentUserInfo?._id
-    );
-
-    setIsOwnUpVote(upVoteMatches?.length > 0);
-    setIsOwnDownVote(downVoteMatches?.length > 0);
-  }, [upVotes, downVotes, currentUserInfo, isOwnUpVote, isOwnDownVote]);
-  // useEffect(() => {
-  //   if (currentUserInfo) {
-  //     setIsOwnUpVote(upVotes?.includes(currentUserInfo?._id));
-  //     setIsOwnDownVote(downVotes?.includes(currentUserInfo?._id));
-  //   }
-  // }, [upVotes, downVotes, currentUserInfo]);
-
-  // if (commentsDataLoading) return <SkeletonLoading />;
-  // if (commentsDataLoading) {
-  //   return <SkeletonLoading />;
-  // }
-
+  if (isLoading || commentsDataLoading || savedPostLoading) {
+    return <p>Loading</p>;
+  }
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
   };
+
+  const like = reactData?.data?.like?.count || 0;
+  const disLike = reactData?.data?.dislike?.count || 0;
 
   const handleCommentSubmit = (e: any) => {
     e.preventDefault();
@@ -119,27 +77,18 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
     }
   };
 
-  const handleUpVotes = (status: string) => {
-    if (!isOwnUpVote && !isOwnDownVote) {
-      const data = {
-        postId: _id,
-        userId: currentUserInfo?._id,
-        status,
-      };
-      if (status === "like") {
-        setIsOwnUpVote(true);
-      }
-      if (status === "dislike") {
-        setIsOwnDownVote(true);
-      }
-      likeStatus(data, {
-        onSuccess: (res) => {
-          // console.log("success");
+  // create post
+  const handleCreateReact = (type: string) => {
+    const payload = {
+      post: _id,
+      type,
+    };
 
-          queryClient.invalidateQueries({ queryKey: ["POST"] });
-        },
-      });
-    }
+    createReact(payload, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["REACT", _id] });
+      },
+    });
   };
 
   const handleModalOpen = () => {
@@ -210,8 +159,8 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
           <div className="flex items-center gap-10 ">
             <svg
               className={`size-7 ${
-                isOwnDownVote || isOwnUpVote
-                  ? isOwnUpVote
+                !!like || !!disLike
+                  ? like
                     ? "text-[#4CAF50] fill-[#4CAF50] cursor-not-allowed"
                     : "cursor-not-allowed"
                   : "cursor-pointer"
@@ -221,7 +170,7 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
               strokeWidth="1.5"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
-              onClick={() => handleUpVotes("like")}
+              onClick={() => handleCreateReact("like")}
             >
               <path
                 d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z"
@@ -234,12 +183,12 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
               strokeWidth="1.5"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
-              onClick={() => handleUpVotes("dislike")}
+              onClick={() => handleCreateReact("dislike")}
               stroke="currentColor"
               // className={`size-7 ${isOwnDownVote ? "text-blue-500 cursor-not-allowed" : "cursor-pointer"} `}
               className={`size-7 ${
-                isOwnDownVote || isOwnUpVote
-                  ? isOwnDownVote
+                !!like || !!disLike
+                  ? disLike
                     ? "text-blue-500 fill-blue-500 cursor-not-allowed"
                     : "cursor-not-allowed"
                   : "cursor-pointer"
@@ -255,7 +204,7 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
 
           <svg
             className={`size-7 ${
-              isSavedPost
+              userSavedPosts?.data?.length > 0
                 ? "text-red-600 fill-red-600"
                 : "text-gray-500 fill-none"
             } cursor-pointer transition-colors duration-200 ease-in-out`}
@@ -275,10 +224,10 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
       </div>
       <div className="flex items-center gap-5">
         <div>
-          <p className="font-bold">{upVotes?.length} likes</p>
+          <p className="font-bold">{like} likes</p>
         </div>
         <div>
-          <p className="font-bold">{downVotes?.length} dislikes</p>
+          <p className="font-bold">{disLike} dislikes</p>
         </div>
       </div>
       <div>

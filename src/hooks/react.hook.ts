@@ -1,36 +1,18 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { createReact, getPostReacts } from "../services/ReactService";
 
-import { createComment, getAllComments } from "../services/CommentService";
-
-export const useCreateComment = () => {
+export const useCreateReact = () => {
   return useMutation<any, Error, any>({
-    mutationKey: ["COMMENTS"],
-    mutationFn: async (commentData) => await createComment(commentData),
-    // onSuccess: () => {
-    //   toast.success("Post created successfully");
-    // },
-    // onError: (error) => {
-    //   toast.error(error.message);
+    mutationKey: ["REACT"],
+    mutationFn: async (payload) => await createReact(payload),
     // },
   });
 };
 
-// export const useUpdatePost = () => {
-//   return useMutation<any, Error, any>({
-//     mutationKey: ["POST"],
-//     mutationFn: async (data) => await updatePost(data),
-//     onError: (error) => {
-//       toast.error(error.message);
-//     },
-//   });
-// };
-
-export const useGetAllComments = (params?: {
-  post?: string;
-  user?: string;
-}) => {
+export const useGetPostReacts = (postId: string) => {
   return useQuery({
-    queryKey: ["COMMENTS"],
-    queryFn: async () => await getAllComments(params),
+    queryKey: ["REACT", postId],
+    queryFn: async () => await getPostReacts(postId),
+    enabled: !!postId,
   });
 };
