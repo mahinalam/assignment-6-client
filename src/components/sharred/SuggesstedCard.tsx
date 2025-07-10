@@ -1,21 +1,13 @@
 import React from "react";
+import { FaChevronRight } from "react-icons/fa6";
 
-const SuggesstedCard = () => {
+const SuggesstedCard = ({ title }: { title: string }) => {
   return (
-    <div className="flex items-center gap-3">
-      <div>
-        <img
-          alt=""
-          className="size-[40px] rounded-full mr-2"
-          //   src={user?.profilePhoto}
-        />
-      </div>
-      <div>
-        <p className="text-sm ">Mahin</p>
-      </div>
-      <div>
-        <span className="text-sm lg:pl-16 text-primary">Follow</span>
-      </div>
+    <div className="flex text-lg gap-4 w-[80%] ">
+      <span>
+        <FaChevronRight className="text-border mt-1" />
+      </span>
+      <p className=" hover:text-border ">{title}</p>
     </div>
   );
 };

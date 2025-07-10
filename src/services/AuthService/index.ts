@@ -7,16 +7,17 @@ import axios from "axios";
 
 import axiosInstance from "@/src/lib/AxiosInstance";
 
-export const getSingleUser = async (id: string) => {
+// get single user
+export const getSingleUser = async () => {
   try {
-    const { data } = await axiosInstance.get(`/users/${id}`);
-
+    const { data } = await axiosInstance.get(`/users/single-user`);
     return data;
   } catch (error: any) {
     throw new Error(error);
   }
 };
 
+// get all users
 export const getAllUsers = async () => {
   try {
     const { data } = await axiosInstance.get(`/users`);

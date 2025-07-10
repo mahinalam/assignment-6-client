@@ -7,11 +7,15 @@ import { useUser } from "@/src/context/user.provider";
 import SuggesstedCard from "./SuggesstedCard";
 import { logout } from "@/src/services/AuthService";
 import { useRouter } from "next/navigation";
+import { useGetAllPosts } from "@/src/hooks/post.hook";
+import { IPost } from "@/src/types";
 
 const RightSection = () => {
   const { user, setIsLoading } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+
+  const { data: postsData } = useGetAllPosts();
 
   const handleLogout = () => {
     logout();
@@ -21,12 +25,12 @@ const RightSection = () => {
 
   console.log({ user });
   return (
-    <div
-      className="relative cursor-pointer"
-      onClick={() => setIsOpen((val) => !val)}
-    >
+    <div className="relative cursor-pointer">
       {/* profile image section */}
-      <div className="flex gap-2 items-center">
+      <div
+        onClick={() => setIsOpen((val) => !val)}
+        className="flex gap-2 items-center"
+      >
         <div className="">
           <img
             alt=""
@@ -44,10 +48,14 @@ const RightSection = () => {
 
       {/* suggessted people */}
       <div>
-        <p className="text-sm font- text-subTitle lg:mt-8 mb-5">
-          Suggested for you
+        <p className="lg:text-lg w-[80%] border-b-4 border-b-border text-subTitle lg:mt-8 mb-5 pb-2">
+          Recent Posts
         </p>
-        <SuggesstedCard />
+        {postsData?.data?.slice(0, 5).map((post: IPost) => (
+          <Link href={`/posts/${post._id}`} key={post._id}>
+            <SuggesstedCard title={post.title} />
+          </Link>
+        ))}
       </div>
       {isOpen && (
         <div className="absolute  z-50  bg-white rounded-xl shadow-md w-[40vw] md:w-[10vw]  overflow-hidden  top-14 text-sm">

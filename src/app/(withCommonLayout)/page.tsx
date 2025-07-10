@@ -7,6 +7,7 @@ import { useGetAllPosts } from "@/src/hooks/post.hook";
 import Loading from "@/src/components/UI/Loading";
 import PostList from "@/src/components/home/PostList";
 import { useUser } from "@/src/context/user.provider";
+import RightSection from "@/src/components/sharred/RightSection";
 
 const INITIAL_NUMBER_OF_POSTS = 10;
 
@@ -30,7 +31,15 @@ const Home = () => {
   console.log("posdata:", postsData);
   return (
     // <Container>
-    <PostList initialPosts={postsData?.data} />
+    <div className="flex">
+      <div className="lg:w-9/12 w-full">
+        <PostList initialPosts={postsData?.data} />
+      </div>
+
+      <div className="lg:w-3/12 lg:block hidden">
+        <RightSection />
+      </div>
+    </div>
   );
 };
 

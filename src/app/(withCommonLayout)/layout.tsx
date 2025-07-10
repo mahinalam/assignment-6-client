@@ -16,10 +16,7 @@ export default async function layout({
         <div className="w-2/12 lg:block hidden">
           <LeftSection />
         </div>
-        <div className="lg:w-7/12 w-full lg:ml-auto">{children}</div>
-        <div className="w-3/12 lg:block hidden">
-          <RightSection />
-        </div>
+        <div className="lg:w-10/12 w-full lg:ml-auto">{children}</div>
       </div>
     </div>
   );

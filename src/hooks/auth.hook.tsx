@@ -83,11 +83,10 @@ export const useUpdateMyProfile = () => {
   });
 };
 
-export const useGetSingleUser = (id: string) => {
+export const useGetSingleUser = () => {
   return useQuery({
     queryKey: ["USER"],
-    queryFn: async () => await getSingleUser(id),
-    enabled: !!id,
+    queryFn: async () => await getSingleUser(),
   });
 };
 

@@ -59,20 +59,26 @@
 // export default PostPage;
 
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
 import { useGetAllPosts, useGetSinglePost } from "@/src/hooks/post.hook";
 import Container from "@/src/components/Container";
 import moment from "moment";
 import RecentPost from "@/src/components/posts/RecentPost";
-import { useGetSingleBlog } from "@/src/hooks/blog.hook";
 import Link from "next/link";
-import { useGetAllComments } from "@/src/hooks/comment.hook";
+import { useCreateComment, useGetAllComments } from "@/src/hooks/comment.hook";
 import { useUser } from "@/src/context/user.provider";
 import { useGetPostReacts } from "@/src/hooks/react.hook";
-const PostDetails = ({ params }: { params: { postId: string } }) => {
-  const { data: singleBlog, isLoading } = useGetSinglePost(params?.postId);
+import { Input } from "@nextui-org/input";
+import { useQueryClient } from "@tanstack/react-query";
+import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/modal";
+import CommentCard from "@/src/components/CommentCard";
 
+const PostDetails = ({ params }: { params: { postId: string } }) => {
+  const { data: singlePost, isLoading } = useGetSinglePost(params?.postId);
+  const queryClient = useQueryClient();
+  const { mutate: handleCreateComment, isPending: createCommentPending } =
+    useCreateComment();
   // const { data } = useGetPostReacts(params?.postId);
   // console.log("react data", data);
 
@@ -82,7 +88,8 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
   // )[0];
 
   const { user: currentUser } = useUser();
-
+  const [comment, setComment] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const {
     data: commentsData,
     isLoading: commentsDataLoading,
@@ -91,14 +98,54 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
     isSuccess,
   } = useGetAllComments({ post: params?.postId, user: currentUser?._id });
 
-  console.log(singleBlog);
+  console.log(singlePost);
   if (isLoading || commentsDataLoading) {
     return <p>Loading...</p>;
   }
 
   console.log({ commentsData });
+  const allPostComments = commentsData?.data?.filter(
+    (item: any) => item?.post?._id === params?.postId
+  );
 
-  const { user } = singleBlog?.data;
+  const myOwnComments =
+    allPostComments?.length > 0 &&
+    allPostComments.filter((item: any) => item?.user?._id === currentUser?._id);
+  const { user } = singlePost?.data;
+
+  // for comment
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setComment(e.target.value);
+  };
+
+  // comment modal open
+  const handleModalOpen = () => {
+    setIsModalOpen(true); // Open modal
+  };
+
+  // comment submit
+  const handleCommentSubmit = (e: any) => {
+    e.preventDefault();
+    if (comment.trim()) {
+      const commentInfo = {
+        post: params.postId,
+        user: currentUser?._id,
+        content: comment,
+      };
+
+      handleCreateComment(commentInfo, {
+        onSuccess: (res) => {
+          queryClient.invalidateQueries({ queryKey: ["COMMENTS"] });
+        },
+      });
+      setComment(""); // Reset input after submission
+    }
+  };
+
+  // commenbt modal close
+  const handleModalClose = () => {
+    setIsModalOpen(false); // Close modal
+  };
   return (
     <div className="w-[90%] mx-auto ">
       <Link className="flex items-center" href={`/profile/${user?._id}`}>
@@ -141,9 +188,9 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
       <div className="">
         <section className="">
           {/* Images Section */}
-          {singleBlog?.data?.images?.length > 0 && (
+          {singlePost?.data?.images?.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-              {singleBlog.data.images.map((image: string, index: number) => (
+              {singlePost.data.images.map((image: string, index: number) => (
                 <img
                   key={index}
                   src={image}
@@ -159,20 +206,20 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
           {/* Post Content */}
           <div
             className="post-content mt-6 text-gray-800 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: singleBlog?.data?.content }}
+            dangerouslySetInnerHTML={{ __html: singlePost?.data?.content }}
           />
         </section>
       </div>
-      {/* <div className="flex items-center gap-5">
+      <div className="flex items-center gap-5">
         <div>
-          <p className="font-bold">{upVotes?.length} likes</p>
+          <p className="font-bold">{1} likes</p>
         </div>
         <div>
-          <p className="font-bold">{downVotes?.length} dislikes</p>
+          <p className="font-bold">{1} dislikes</p>
         </div>
       </div>
-      <div> */}
-      {/* <div className="cursor-pointer font-extralight">
+      <div>
+        <div className="cursor-pointer my-1 font-extralight">
           {allPostComments?.length > 0 ? (
             <button onClick={handleModalOpen}>
               View all {allPostComments?.length} comments{" "}
@@ -190,14 +237,14 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
                 key={comment._id}
                 className="flex items-center gap-1 font-bold"
               >
-                <p>{currentUserInfo?.name}</p>
-                <p>{comment.content}</p>
+                <p>{currentUser?.name}</p>
+                <p className="text-slate-500">{comment.content}</p>
               </div>
             ))}
         </div>
       </div>
       <form onSubmit={handleCommentSubmit}>
-        <div className="relative">
+        <div className="relative mt-1">
           {createCommentPending ? (
             <p>Loading ...</p>
           ) : (
@@ -218,7 +265,40 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
             </>
           )}
         </div>
-      </form> */}
+      </form>
+      <Modal
+        className="mt-16"
+        isOpen={isModalOpen}
+        size="5xl"
+        onClose={handleModalClose}
+      >
+        <ModalContent>
+          <ModalHeader>Comments</ModalHeader>
+          <ModalBody>
+            <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
+              <div>
+                {/* <Image alt=""  src={img} /> */}
+                <img
+                  alt=""
+                  className="h-[80vh] w-full"
+                  src={singlePost?.data?.images?.[0] || ""}
+                />
+              </div>
+              <div className="">
+                {allPostComments?.map((comment: any) => (
+                  <div key={comment._id}>
+                    <CommentCard comment={comment} />
+                    {/* <div>Mahindhgdfuhguhdghug</div> */}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ModalBody>
+          {/* <ModalFooter>
+            <Button onPress={handleModalClose}>Close</Button>
+          </ModalFooter> */}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

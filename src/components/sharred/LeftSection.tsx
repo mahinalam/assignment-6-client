@@ -12,9 +12,12 @@ import { CiHeart } from "react-icons/ci";
 import { Input } from "@nextui-org/input";
 import { IoBookmarkOutline } from "react-icons/io5";
 import { GrContact } from "react-icons/gr";
+import { useGetSingleUser } from "@/src/hooks/auth.hook";
 
 const LeftSection = () => {
   const { user } = useUser();
+  const { data: currentUserInfo } = useGetSingleUser();
+
   return (
     <div className="border-r-2 fixed p-5 inset-0 w-2/12">
       <Input
@@ -59,19 +62,19 @@ const LeftSection = () => {
       <NavComponent
         icon={<IoBookmarkOutline size={30} />}
         title="About"
-        address="/"
+        address="/about"
       />
       <NavComponent
         icon={<GrContact size={30} />}
         title="Contact"
-        address="/"
+        address="/contact"
       />
       <Link className="flex items-center" href={`/profile/${user?._id}`}>
         <div>
           <img
             alt=""
             className="size-[40px] rounded-full mr-2"
-            src={user?.profilePhoto}
+            src={currentUserInfo?.data?.profilePhoto}
           />
         </div>
         <p className="font-bold mr-1 text-medium">{user?.name}</p>
