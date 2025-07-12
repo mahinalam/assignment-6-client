@@ -1,7 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { IoMdHome } from "react-icons/io";
-import NavComponent from "./NavComponent";
 import Link from "next/link";
 import { useUser } from "@/src/context/user.provider";
 import SuggesstedCard from "./SuggesstedCard";
@@ -9,13 +7,20 @@ import { logout } from "@/src/services/AuthService";
 import { useRouter } from "next/navigation";
 import { useGetAllPosts } from "@/src/hooks/post.hook";
 import { IPost } from "@/src/types";
+import { useGetSingleUser } from "@/src/hooks/auth.hook";
+import { LuUserRound } from "react-icons/lu";
 
 const RightSection = () => {
   const { user, setIsLoading } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const { data: currentUserInfo } = useGetSingleUser();
 
-  const { data: postsData } = useGetAllPosts();
+  const { data: postsData, isLoading, isSuccess } = useGetAllPosts();
+
+  if (isLoading) {
+    return <p>Loading</p>;
+  }
 
   const handleLogout = () => {
     logout();
@@ -23,7 +28,7 @@ const RightSection = () => {
     router.push("/login");
   };
 
-  console.log({ user });
+  console.log({ postsData });
   return (
     <div className="relative cursor-pointer">
       {/* profile image section */}
@@ -32,11 +37,15 @@ const RightSection = () => {
         className="flex gap-2 items-center"
       >
         <div className="">
-          <img
-            alt=""
-            className="size-[40px] rounded-full mr-2"
-            src={user?.profilePhoto}
-          />
+          {currentUserInfo?.data?.profilePhoto ? (
+            <img
+              alt=""
+              className="size-[40px] rounded-full mr-2"
+              src={currentUserInfo?.data?.profilePhoto}
+            />
+          ) : (
+            <LuUserRound size={40} />
+          )}
         </div>
         <div>
           <p className="lg:text-sm">mahinalam@gmail.com</p>
@@ -51,11 +60,13 @@ const RightSection = () => {
         <p className="lg:text-lg w-[80%] border-b-4 border-b-border text-subTitle lg:mt-8 mb-5 pb-2">
           Recent Posts
         </p>
-        {postsData?.data?.slice(0, 5).map((post: IPost) => (
-          <Link href={`/posts/${post._id}`} key={post._id}>
-            <SuggesstedCard title={post.title} />
-          </Link>
-        ))}
+        {!isLoading &&
+          isSuccess &&
+          postsData?.data?.slice(0, 5)?.map((post: IPost) => (
+            <Link href={`/posts/${post._id}`} key={post._id}>
+              <SuggesstedCard title={post.title} />
+            </Link>
+          ))}
       </div>
       {isOpen && (
         <div className="absolute  z-50  bg-white rounded-xl shadow-md w-[40vw] md:w-[10vw]  overflow-hidden  top-14 text-sm">

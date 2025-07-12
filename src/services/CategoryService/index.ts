@@ -16,12 +16,3 @@ export const getAllCategories = async () => {
     throw new Error(error);
   }
 };
-export const getSingleGardeningPost = async (id: string) => {
-  try {
-    const { data } = await axiosInstance.get(`/gardening-posts/${id}`);
-
-    return data;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-};

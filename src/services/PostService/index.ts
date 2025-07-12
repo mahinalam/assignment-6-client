@@ -55,41 +55,33 @@ export const createSavedPost = async (savedPostData: {
   }
 };
 
+// all posts
 export const getAllGardeningPosts = async (offset?: number, limit?: number) => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/gardening-posts`,
-      { cache: "no-store" }
-    );
-    const data = await res.json();
-    // console.log({ data });
-
+    const { data } = await axiosInstance.get(`/gardening-posts`);
     return data;
   } catch (error: any) {
     throw new Error(error);
   }
 };
 
-export const getUserSavedPostCollection = async (
-  id: string,
-  postId: string
-) => {
-  console.log("from hook", id);
-  try {
-    const { data } = await axiosInstance.get(
-      `/wishlist?user=${id}&post=${postId}`
-    );
-
-    return data;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-};
-
+// single post
 export const getSingleGardeningPost = async (id: string) => {
+  console.log("params id", id);
   try {
     const { data } = await axiosInstance.get(`/gardening-posts/${id}`);
-    console.log({ singlepost: data });
+    console.log("data", data);
+    return data;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
+
+export const getUserSavedPostCollection = async (id: string) => {
+  console.log("from hook", id);
+  try {
+    const { data } = await axiosInstance.get(`/wishlist?user=${id}`);
+
     return data;
   } catch (error: any) {
     throw new Error(error);
@@ -131,6 +123,19 @@ export const updateLikeStatus = async (
       `/gardening-posts`,
       likeStatusData
     );
+
+    return data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+// create share
+export const createShare = async (
+  payload: Record<string, unknown>
+): Promise<any> => {
+  try {
+    console.log("payload from server", payload);
+    const { data } = await axiosInstance.post(`/share`, payload);
 
     return data;
   } catch (error: any) {

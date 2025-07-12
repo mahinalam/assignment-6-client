@@ -17,27 +17,12 @@ const Home = () => {
     INITIAL_NUMBER_OF_POSTS
   );
 
-  const { user } = useUser();
-  if (!user) {
-  }
-
-  // const { data } = await getAllGardeningPosts();
-  // const { data: postsData, isLoading } = useGetAllPosts();
-
-  // if (isLoading) {
-  //   return <Loading />;
-  // }
-  // console.log("API:", process.env.NEXT_PUBLIC_BASE_API);
   console.log("posdata:", postsData);
   return (
     // <Container>
     <div className="flex">
-      <div className="lg:w-9/12 w-full">
+      <div className=" w-full">
         <PostList initialPosts={postsData?.data} />
-      </div>
-
-      <div className="lg:w-3/12 lg:block hidden">
-        <RightSection />
       </div>
     </div>
   );

@@ -4,16 +4,17 @@ import { toast } from "sonner";
 import {
   createPost,
   createSavedPost,
+  createShare,
   deletePost,
   deleteSavedPost,
   getAllGardeningPosts,
+  getSingleGardeningPost,
   getUserGardeningPost,
   getUserSavedPostCollection,
   updateLikeStatus,
   updatePost,
 } from "../services/PostService";
 import { followUser, unFollowUser } from "../services/AuthService";
-import { getSingleGardeningPost } from "../services/CategoryService";
 import { IPost } from "../types";
 // import {getSingle}
 
@@ -78,6 +79,14 @@ export const useUpdatePost = () => {
   });
 };
 
+// share post
+export const useCreateSharePost = () => {
+  return useMutation<any, Error, any>({
+    mutationKey: ["POST"],
+    mutationFn: async (data: Partial<IPost>) => await createShare(data),
+  });
+};
+
 export const useUpdateLikeStatus = () => {
   return useMutation<any, Error, any>({
     mutationKey: ["POST"],
@@ -99,19 +108,19 @@ export const useGetAllPosts = (offset?: number, limit?: number) => {
 
 export const useGetSinglePost = (id: string) => {
   return useQuery({
-    queryKey: ["POST"],
+    queryKey: ["POST", id],
     queryFn: async () => await getSingleGardeningPost(id),
     enabled: !!id,
   });
 };
 
-export const useGetUserSavedPosts = (id: string, postId: string) => {
+export const useGetUserSavedPosts = (userId: string) => {
   return useQuery({
-    queryKey: ["WISHLIST", id, postId],
+    queryKey: ["WISHLIST", userId],
     queryFn: async () => {
-      return await getUserSavedPostCollection(id, postId);
+      return await getUserSavedPostCollection(userId);
     },
-    enabled: !!id && !!postId,
+    enabled: !!userId,
   });
 };
 

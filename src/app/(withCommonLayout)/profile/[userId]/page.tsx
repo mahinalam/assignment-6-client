@@ -32,6 +32,8 @@ import FollowerCard from "@/src/components/profile/FolowerCard";
 import Loading from "@/src/components/UI/Loading";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import PostImageCard from "./PostImageCard";
+import { useGetPostReacts } from "@/src/hooks/react.hook";
 
 const ProfilePage = ({ params }: { params: { userId: string } }) => {
   console.log({ params });
@@ -44,6 +46,10 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
   const router = useRouter();
 
   const { user: curentUserInfo } = useUser();
+
+  const { data: savedPosts } = useGetUserSavedPosts(
+    curentUserInfo?._id as string
+  );
 
   console.log("curentUserInfo", curentUserInfo);
 
@@ -188,62 +194,6 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
     verifyProfile();
   };
 
-  // if (userPostInfoLoading || userFollowersDataLoading) {
-  //   return (
-  //     <div className="h-[90vh] w-full flex items-center justify-center">
-  //       <Loading />
-  //     </div>
-  //   );
-  // }
-  // if (savedPostLoading) {
-  //   return <Loading />;
-  // }
-  // console.log(params?.userId);
-  //
-
-  // const [userSavedPostInfo, setUserSavedPostInfo] = useState(null);
-  // const [userSavedPostInfoLoading, setUserSavedPostInfoLoading] =
-  //   useState(false);
-  //
-
-  // // const { data: userSavedPostInfo, isLoading: userSavedPostInfoLoading } =
-  // //   useGetUserSavedPosts(
-  // //     curentUserInfo?._id as string,
-
-  // //   );
-  //
-
-  //
-  //
-  //
-  //
-
-  //
-
-  //
-  // useEffect(() => {
-  //   if (isOwnProfile && curentUserInfo?._id) {
-  //     setUserSavedPostInfoLoading(true);
-  //     // eslint-disable-next-line react-hooks/rules-of-hooks
-  //     const { data, isLoading } = useGetUserSavedPosts(
-  //       curentUserInfo._id as string
-  //     );
-  //     setUserSavedPostInfo(data);
-  //     setUserSavedPostInfoLoading(isLoading);
-  //   }
-  // }, [curentUserInfo?._id]);
-
-  //
-
-  // if (userDataLoading || userPostInfoLoading) {
-  //   return <p>Loading ...</p>;
-  // }
-
-  //
-
-  // console.log("user", user);
-  // console.log("posts", posts);
-
   return (
     <Container>
       <div className="flex md:gap-15 gap-10 md:my-10 my-5">
@@ -384,36 +334,30 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
         <div className="flex w-full flex-col">
           <Tabs aria-label="Options" variant="solid">
             <Tab key="posts" title="POSTS">
-              <Card>
-                <CardBody>
-                  <div className="grid grid-cols-3 gap-5">
-                    {userPostInfo?.data?.length > 0 ? (
-                      userPostInfo?.data?.map((item: any) => (
-                        <img
-                          key={item._id}
-                          alt=""
-                          className="w-full h-full object-cover"
-                          src={item.images[0]}
-                        />
-                      ))
-                    ) : (
-                      <p>You don't have any post yet.</p>
-                    )}
-                  </div>
-                  {/* //TODO: fix this tab */}
-                </CardBody>
-              </Card>
+              <div className="grid grid-cols-3 gap-5">
+                {userPostInfo?.data?.length > 0 ? (
+                  userPostInfo?.data?.map((item: any) => (
+                    <PostImageCard image={item.images[0]} id={item._id} />
+                  ))
+                ) : (
+                  <p>You don't have any post yet.</p>
+                )}
+              </div>
             </Tab>
             {isOwnProfile && (
               <Tab key="saved" title="SAVED">
-                <Card>
-                  <CardBody>
-                    Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                    laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                    irure dolor in reprehenderit in voluptate velit esse cillum
-                    dolore eu fugiat nulla pariatur.
-                  </CardBody>
-                </Card>
+                <div className="grid grid-cols-3 gap-5">
+                  {savedPosts?.data?.length > 0 ? (
+                    savedPosts?.data?.map((item: any) => (
+                      <PostImageCard
+                        image={item.post?.images[0]}
+                        id={item.post._id}
+                      />
+                    ))
+                  ) : (
+                    <p>You don't have any post yet.</p>
+                  )}
+                </div>
               </Tab>
             )}
           </Tabs>
@@ -490,14 +434,6 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
                   </p>
                 )}
               </ModalBody>
-              {/* <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onClick={handleVerifyProfile}>
-                  Verify
-                </Button>
-              </ModalFooter> */}
             </>
           )}
         </ModalContent>

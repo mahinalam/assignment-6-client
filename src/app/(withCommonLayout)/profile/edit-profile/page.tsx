@@ -70,7 +70,7 @@ const EditProfile = () => {
 
   return (
     <Container>
-      <h1>Edit Profile</h1>
+      <h1 className="mb-3 font-bold text-xl">Edit Profile</h1>
       <GTForm onSubmit={onSubmit}>
         <div className="space-y-4">
           <div className="flex justify-between items-center p-4 bg-[#EFEFEF] rounded-3xl">

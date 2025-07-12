@@ -16,17 +16,25 @@ import { useCreateComment, useGetAllComments } from "@/src/hooks/comment.hook";
 import { useUser } from "@/src/context/user.provider";
 import {
   useCreateSavedPost,
+  useCreateSharePost,
   useGetUserSavedPosts,
 } from "@/src/hooks/post.hook";
 import { useCreateReact, useGetPostReacts } from "@/src/hooks/react.hook";
 import { IUser } from "@/src/types";
 import WishlistModal from "../modal/WishlistModal";
 import { useRouter } from "next/navigation";
+import { AiOutlineLike } from "react-icons/ai";
+import { IoShareSocialOutline } from "react-icons/io5";
+import ShareModal from "../modal/ShareModal";
+import { useGetSingleUser } from "@/src/hooks/auth.hook";
+import { toast } from "sonner";
+import PostCardSkeleton from "./PostCardLoading";
 
 const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
   const queryClient = useQueryClient();
   const { _id, images, votes, user, upVotes, downVotes, title } = item;
   const [isSavedPost, setIsSavedPost] = useState(false);
+  const [text, setText] = useState("");
 
   // const [isOwnUpVotes, setIs]
   const [comment, setComment] = useState("");
@@ -41,6 +49,8 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
 
   const { user: currentUserInfo } = useUser();
 
+  const { data: singleUser } = useGetSingleUser();
+
   const { data: commentsData, isLoading: commentsDataLoading } =
     useGetAllComments();
   const { data: reactData, isLoading } = useGetPostReacts(_id);
@@ -48,17 +58,28 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
   const { data: userSavedPosts, isLoading: savedPostLoading } =
     useGetUserSavedPosts((currentUserInfo as IUser)?._id, _id);
 
+  // for wiushlist
   const {
     isOpen: isWishlistModalOpen,
     onOpen: onWishlistModalOpen,
     onOpenChange: onWishlistModalOpenChange,
   } = useDisclosure();
 
-  const router = useRouter();
+  // for share
+  const {
+    isOpen: isShareModalOpen,
+    onOpen: onShareModalOpen,
+    onOpenChange: onShareModalOpenChange,
+  } = useDisclosure();
 
+  const router = useRouter();
+  // all post comments
   const allPostComments = commentsData?.data?.filter(
     (item: any) => item?.post?._id == _id
   );
+
+  const { mutate: sharePostFn } = useCreateSharePost();
+
   const myOwnComments =
     allPostComments?.length > 0 &&
     allPostComments.filter(
@@ -66,7 +87,7 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
     );
 
   if (isLoading || commentsDataLoading || savedPostLoading) {
-    return <p>Loading</p>;
+    return <PostCardSkeleton />;
   }
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -143,6 +164,23 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
       ? `${title} post is already added to saved post.`
       : `${title} post has been added to saved post.`;
 
+  // create share fn
+  const createSharePost = () => {
+    const id = toast.loading("Posting...");
+    const payload = {
+      post: _id,
+      user: user?._id,
+      title: text,
+    };
+
+    sharePostFn(payload, {
+      onSuccess: () => {
+        toast.success("Post shared successfully!", { id });
+        onShareModalOpenChange();
+      },
+    });
+  };
+
   return (
     <div className="space-y-2 mt-1 md:w-[80%] w-full mx-auto h-auto">
       {" "}
@@ -192,7 +230,55 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
         <div className="flex items-center justify-between gap-4 mt-2">
           <div className="flex items-center gap-10 ">
             <div className="flex items-center gap-2 ">
+              {/* <AiOutlineLike
+                className={` ${
+                  !!like || !!disLike
+                    ? like
+                      ? "text-[#4CAF50] !fill-[#4CAF50] cursor-not-allowed"
+                      : "cursor-not-allowed"
+                    : "cursor-pointer"
+                }`}
+                size={30}
+              /> */}
+              {/* <svg
+                className={`size-7 transition-colors duration-200 ease-in-out ${
+                  like
+                    ? "text-[#1877F2] cursor-not-allowed"
+                    : disLike
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-gray-600 hover:text-[#1877F2] cursor-pointer"
+                }`}
+                fill="currentColor" // ✅ Important!
+                stroke="currentColor"
+                strokeWidth="1.5"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                onClick={() => !like && !disLike && handleLike()}
+              >
+                <path d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904" />
+              </svg> */}
               <svg
+                className={`size-7 ${
+                  !!like || !!disLike
+                    ? like
+                      ? "text-secondary fill-secondary cursor-not-allowed"
+                      : "cursor-not-allowed"
+                    : "cursor-pointer"
+                } `}
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                fill={`${like ? "currentColor" : "none"} `}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z"
+                />
+              </svg>
+
+              {/* <svg
                 className={`size-7 ${
                   !!like || !!disLike
                     ? like
@@ -212,12 +298,12 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-              </svg>
+              </svg> */}
               <p className="text-[#65686C]">{like}</p>
             </div>
             <div className="flex items-center gap-2">
               <svg
-                fill="none"
+                fill={`${disLike ? "currentColor" : "none"} `}
                 strokeWidth="1.5"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
@@ -240,6 +326,11 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
               </svg>
               <p className="text-[#65686C]">{disLike}</p>
             </div>
+            <IoShareSocialOutline
+              className="cursor-pointer"
+              onClick={onShareModalOpen}
+              size={28}
+            />
           </div>
 
           <svg
@@ -339,9 +430,6 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
               </div>
             </div>
           </ModalBody>
-          {/* <ModalFooter>
-            <Button onPress={handleModalClose}>Close</Button>
-          </ModalFooter> */}
         </ModalContent>
       </Modal>
       <div>
@@ -354,6 +442,15 @@ const PostCard = ({ item, refetch }: { item: any; refetch?: any }) => {
         isOpen={isWishlistModalOpen}
         subTitle={wishlistSubtitle}
         onOpenChange={onWishlistModalOpenChange}
+      />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onOpenChange={onShareModalOpenChange}
+        user={singleUser?.data}
+        createSharePost={createSharePost}
+        setText={setText}
+        text={text}
+        clipBoard={`${process.env.NEXT_PUBLIC_CLIENT_API}/posts/${_id}`}
       />
     </div>
   );
