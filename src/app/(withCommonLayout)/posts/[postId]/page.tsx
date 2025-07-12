@@ -89,6 +89,7 @@ import { IUser } from "@/src/types";
 import ShareModal from "@/src/components/modal/ShareModal";
 import { toast } from "sonner";
 import { useGetSingleUser } from "@/src/hooks/auth.hook";
+import Loading from "./loading";
 
 const PostDetails = ({ params }: { params: { postId: string } }) => {
   const { data: singlePost, isLoading } = useGetSinglePost(params?.postId);
@@ -140,7 +141,7 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
     useGetUserSavedPosts((currentUser as IUser)?._id, params.postId);
 
   if (isLoading || commentsDataLoading || reactLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   console.log({ commentsData });
