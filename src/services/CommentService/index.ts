@@ -42,31 +42,13 @@ export const getUserSpecificComments = async (id: string) => {
   }
 };
 
-// export const getUserGardeningPost = async (id: string) => {
-//   try {
-//     const { data } = await axiosInstance.get(
-//       `/gardening-posts/get-user-posts/${id}`
-//     );
+// delete comment
+export const deleteComment = async (commentId: string): Promise<any> => {
+  try {
+    const { data } = await axiosInstance.delete(`/comments/${commentId}`);
 
-//     return data;
-//   } catch (error: any) {
-//     throw new Error(error);
-//   }
-// };
-
-// // update post
-// export const updatePost = async (
-//   updatedPostdata: Record<string, unknown>
-// ): Promise<any> => {
-//   try {
-//     const { data } = await axiosInstance.put(
-//       `/gardening-posts/${updatedPostdata.postId}`,
-//       updatedPostdata.data
-//     );
-
-//     return data;
-//   } catch (error: any) {
-//     console.log(error.message);
-//     throw new Error(error.message);
-//   }
-// };
+    return data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};

@@ -1,29 +1,25 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createComment, getAllComments } from "../services/CommentService";
+import {
+  createComment,
+  deleteComment,
+  getAllComments,
+} from "../services/CommentService";
 
 export const useCreateComment = () => {
   return useMutation<any, Error, any>({
     mutationKey: ["COMMENTS"],
     mutationFn: async (commentData) => await createComment(commentData),
-    // onSuccess: () => {
-    //   toast.success("Post created successfully");
-    // },
-    // onError: (error) => {
-    //   toast.error(error.message);
-    // },
   });
 };
 
-// export const useUpdatePost = () => {
-//   return useMutation<any, Error, any>({
-//     mutationKey: ["POST"],
-//     mutationFn: async (data) => await updatePost(data),
-//     onError: (error) => {
-//       toast.error(error.message);
-//     },
-//   });
-// };
+// delete comment
+export const useDeleteComment = () => {
+  return useMutation<any, Error, any>({
+    mutationKey: ["COMMENTS"],
+    mutationFn: async (commentId: string) => await deleteComment(commentId),
+  });
+};
 
 export const useGetAllComments = (params?: {
   post?: string;
