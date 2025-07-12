@@ -74,9 +74,9 @@ export default function CreatePost() {
     setImageFiles(updatedImage);
   };
   return (
-    <div className=" w-full mx-auto">
+    <div className="w-full lg:w-[60%] mx-auto">
       <div>
-        <h1 className="font-semibold lg:text-2xl lg:my-10">Create Post</h1>
+        <h1 className="font-semibold lg:text-2xl my-5 lg:my-10">Create Post</h1>
       </div>
       <GTForm onSubmit={onSubmit}>
         {/* Title Field */}
@@ -138,8 +138,8 @@ export default function CreatePost() {
             ))}
           </div>
         )} */}
-        <div>
-          <p className=" mt-10 font-bold mb-3">Upload Image</p>
+        <div className="lg:pt-0 pt-5">
+          <p className=" mt-12 font-bold mb-3">Upload Image</p>
           <label
             aria-label="Upload Your Files"
             className={`flex cursor-pointer hover:bg-athens-gray-50/10 items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all`}

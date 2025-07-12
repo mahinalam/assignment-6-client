@@ -34,6 +34,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import PostImageCard from "./PostImageCard";
 import { useGetPostReacts } from "@/src/hooks/react.hook";
+import ProfileSkeleton from "./Loading";
 
 const ProfilePage = ({ params }: { params: { userId: string } }) => {
   console.log({ params });
@@ -47,9 +48,8 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
 
   const { user: curentUserInfo } = useUser();
 
-  const { data: savedPosts } = useGetUserSavedPosts(
-    curentUserInfo?._id as string
-  );
+  const { data: savedPosts, isLoading: savedPOstLoading } =
+    useGetUserSavedPosts(curentUserInfo?._id as string);
 
   console.log("curentUserInfo", curentUserInfo);
 
@@ -128,6 +128,10 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
     }
   }, [curentUserInfo?._id, postCreatorUser?._id]);
 
+  if (userFollowersDataLoading || userPostInfoLoading) {
+    return <ProfileSkeleton />;
+  }
+
   // follow user
   const handleFollowUser = () => {
     if (postCreatorUser?._id && curentUserInfo?._id) {
@@ -195,146 +199,105 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
   };
 
   return (
-    <Container>
-      <div className="flex md:gap-15 gap-10 md:my-10 my-5">
-        <div>
-          <div className="flex gap-4">
-            <div>
-              <img
-                alt=""
-                className="md:size-[150px] size-[120px] rounded-full"
-                src={postCreatorUser?.profilePhoto}
-              />
-            </div>
-          </div>
+    <div className="lg:w-[70%] w-full mx-auto">
+      <div className="flex flex-col md:flex-row md:items-start md:gap-10 items-center">
+        {/* Profile Image */}
+        <div className="flex justify-center">
+          <img
+            src={postCreatorUser?.profilePhoto}
+            alt="Profile"
+            className="w-24 h-24 md:w-36 md:h-36 rounded-full object-cover"
+          />
         </div>
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="flex gap-2 mr-5">
-              <p className="font-bold">{postCreatorUser?.name}</p>
-              {postCreatorUser?.isVerified === true && (
-                <div>
-                  <svg
-                    className="size-6"
-                    fill="#1DA1F2"
-                    stroke="white"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle cx="12" cy="12" fill="#1DA1F2" r="10" />
-                    <path
-                      d="M9 12.75 11.25 15 15 9.75"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
+
+        {/* Name, Stats, Actions */}
+        <div className="flex-1 mt-4 md:mt-0 w-full">
+          {/* Name and Actions */}
+          <div className="flex flex-col md:flex-row md:items-center md:gap-4 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-2">
+              <h2 className="text-lg font-bold">{postCreatorUser?.name}</h2>
+              {postCreatorUser?.isVerified && (
+                <svg
+                  className="w-5 h-5"
+                  fill="#1DA1F2"
+                  stroke="white"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" fill="#1DA1F2" r="10" />
+                  <path
+                    d="M9 12.75 11.25 15 15 9.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               )}
             </div>
-            {!isOwnProfile &&
-              (isFollower ? (
-                <Button onClick={() => onFollowModalOpen()}>Following</Button>
+
+            {/* Action Buttons */}
+            <div className="mt-2 md:mt-0 flex justify-center md:justify-start gap-2">
+              {!isOwnProfile ? (
+                isFollower ? (
+                  <Button size="sm" onClick={onFollowModalOpen}>
+                    Following
+                  </Button>
+                ) : (
+                  <Button size="sm" onClick={handleFollowUser}>
+                    Follow
+                  </Button>
+                )
               ) : (
-                <Button onClick={() => handleFollowUser()}>Follow</Button>
-              ))}
-            {isOwnProfile && (
-              <>
-                <Button onClick={() => router.push("/profile/edit-profile")}>
-                  Edit Profile
-                </Button>
-                <Button onClick={onOpen}>Verify Profile</Button>{" "}
-                {/* Marked: Button to open modal */}
-              </>
-            )}
+                <>
+                  <Button
+                    size="sm"
+                    onClick={() => router.push("/profile/edit-profile")}
+                  >
+                    Edit Profile
+                  </Button>
+                  <Button
+                    className="hidden lg:block"
+                    size="sm"
+                    onClick={onOpen}
+                  >
+                    Verify
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-5">
-            <p>
+
+          {/* Stats: posts, followers, following */}
+          <div className="flex justify-center md:justify-start gap-8 mt-4">
+            <div>
               <span className="font-bold">{posts?.length}</span> posts
-            </p>
-            {/* // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-            <p className="cursor-pointer" onClick={() => onFollowerModalOpen()}>
+            </div>
+            <div className="cursor-pointer" onClick={onFollowerModalOpen}>
               <span className="font-bold">
                 {postCreatorUser?.followers?.length}
               </span>{" "}
               followers
-            </p>
-            <p
-              className="cursor-pointer"
-              onClick={() => onFollowingModalOpen()}
-            >
+            </div>
+            <div className="cursor-pointer" onClick={onFollowingModalOpen}>
               <span className="font-bold">
                 {postCreatorUser?.following?.length}
               </span>{" "}
               following
-            </p>
+            </div>
           </div>
-          <div className="flex items-center gap-5">
-            <p>{postCreatorUser?.email}</p>
+
+          {/* Email or Bio */}
+          <div className="mt-4 text-center md:text-left">
+            <p className="text-sm text-gray-600">{postCreatorUser?.email}</p>
           </div>
         </div>
       </div>
-      <Modal isOpen={isOpen} size="xl" onClose={onClose}>
-        {" "}
-        {/* Marked: Modal starts */}
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Verify Profile
-              </ModalHeader>
-              <ModalBody>
-                <p>
-                  Verification Required: To proceed, a minimum balance of BDT
-                  1000 is needed for account verification. Please ensure you
-                  have sufficient funds to continue.
-                </p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onClick={handleVerifyProfile}>
-                  Verify
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>{" "}
-      <Modal isOpen={isFollowModalOpen} size="xl" onClose={onFollowModalClose}>
-        {" "}
-        {/* Marked: Modal starts */}
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="">
-                <button onClick={() => handleUnFollowUser()}>
-                  {" "}
-                  <span>Unfollow</span> <span>{postCreatorUser?.name}</span>
-                </button>
-              </ModalHeader>
-              <ModalBody>
-                <p>Are you sure want to unfollow {postCreatorUser?.name}?</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onClick={handleUnFollowUser}>
-                  Unfollow
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>{" "}
       {/* Marked: Modal ends */}
       <div>
-        <div className="flex w-full flex-col">
+        <div className="flex w-full mt-6 lg:mt-8 flex-col">
           <Tabs aria-label="Options" variant="solid">
             <Tab key="posts" title="POSTS">
-              <div className="grid grid-cols-3 gap-5">
+              <div className="grid lg:grid-cols-3 grid-cols-1 md:grid-cols-2 gap-5">
                 {userPostInfo?.data?.length > 0 ? (
                   userPostInfo?.data?.map((item: any) => (
                     <PostImageCard image={item.images[0]} id={item._id} />
@@ -438,7 +401,62 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
           )}
         </ModalContent>
       </Modal>{" "}
-    </Container>
+      <Modal isOpen={isOpen} size="xl" onClose={onClose}>
+        {" "}
+        {/* Marked: Modal starts */}
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Verify Profile
+              </ModalHeader>
+              <ModalBody>
+                <p>
+                  Verification Required: To proceed, a minimum balance of BDT
+                  1000 is needed for account verification. Please ensure you
+                  have sufficient funds to continue.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="primary" onClick={handleVerifyProfile}>
+                  Verify
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isFollowModalOpen} size="xl" onClose={onFollowModalClose}>
+        {" "}
+        {/* Marked: Modal starts */}
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="">
+                <button onClick={() => handleUnFollowUser()}>
+                  {" "}
+                  <span>Unfollow</span> <span>{postCreatorUser?.name}</span>
+                </button>
+              </ModalHeader>
+              <ModalBody>
+                <p>Are you sure want to unfollow {postCreatorUser?.name}?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="primary" onClick={handleUnFollowUser}>
+                  Unfollow
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </div>
   );
 };
 

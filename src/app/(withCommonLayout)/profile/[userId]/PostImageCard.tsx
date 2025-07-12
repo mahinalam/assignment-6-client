@@ -3,6 +3,7 @@ import { useGetPostReacts } from "@/src/hooks/react.hook";
 import Link from "next/link";
 import React from "react";
 import { FaHeart, FaComment } from "react-icons/fa";
+import PostImageCardSkeleton from "./PostImageCardLoading";
 
 interface Props {
   image: string;
@@ -12,7 +13,7 @@ interface Props {
 const PostImageCard = ({ image, id }: Props) => {
   const { data: reactData, isLoading } = useGetPostReacts(id);
   if (isLoading) {
-    return <p>Loading</p>;
+    return <PostImageCardSkeleton />;
   }
   return (
     <Link href={`/posts/${id}`}>

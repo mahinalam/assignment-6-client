@@ -21,8 +21,11 @@ const Home = () => {
   return (
     // <Container>
     <div className="flex">
-      <div className=" w-full">
+      <div className=" w-full lg:w-9/12">
         <PostList initialPosts={postsData?.data} />
+      </div>
+      <div className="lg:w-3/12 hidden lg:block">
+        <RightSection />
       </div>
     </div>
   );
