@@ -1,5 +1,9 @@
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  UseQueryOptions,
+} from '@tanstack/react-query';
 
 import {
   createPost,
@@ -8,73 +12,46 @@ import {
   deletePost,
   deleteSavedPost,
   getAllGardeningPosts,
+  getAllSharePosts,
   getSingleGardeningPost,
-  getUserGardeningPost,
+  getTopGardeners,
   getUserSavedPostCollection,
   updateLikeStatus,
   updatePost,
-} from "../services/PostService";
-import { followUser, unFollowUser } from "../services/AuthService";
-import { IPost } from "../types";
-// import {getSingle}
+} from '../services/PostService';
+import { IPost, IUser } from '../types';
 
 export const useCreatePost = () => {
   return useMutation<any, Error, FormData>({
-    mutationKey: ["POST"],
+    mutationKey: ['POST'],
     mutationFn: async (postData) => await createPost(postData),
   });
 };
 export const useDeletePost = () => {
   return useMutation<any, Error, any>({
-    mutationKey: ["POST"],
+    mutationKey: ['POST'],
     mutationFn: async (id: string) => await deletePost(id),
   });
 };
 
-export const useCreateSavedPost = () => {
+export const useCreateSavedPost = (userId: string) => {
   return useMutation<any, Error, any>({
-    mutationKey: ["WISHLIST"],
-    mutationFn: async (data: { user: string; post: string }) =>
-      await createSavedPost(data),
-
-    onError: (error) => {
-      console.log(error);
-    },
+    mutationKey: ['WISHLIST', userId],
+    mutationFn: async (data: { post: string }) => await createSavedPost(data),
   });
 };
 
 // delete saved post
 export const useDeleteSavedPost = () => {
   return useMutation<any, Error, any>({
-    mutationKey: ["WISHLIST"],
+    mutationKey: ['WISHLIST'],
     mutationFn: async (id: string) => await deleteSavedPost(id),
-  });
-};
-
-export const useFollowUser = () => {
-  return useMutation<any, Error, any>({
-    mutationKey: ["USER"],
-    mutationFn: async (userIds) => await followUser(userIds),
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-};
-
-// unfollow user
-export const useUnFollowUser = () => {
-  return useMutation<any, Error, any>({
-    mutationKey: ["USER"],
-    mutationFn: async (userIds) => await unFollowUser(userIds),
-    onError: (error) => {
-      toast.error(error.message);
-    },
   });
 };
 
 export const useUpdatePost = () => {
   return useMutation<any, Error, any>({
-    mutationKey: ["POST"],
+    mutationKey: ['POST'],
     mutationFn: async (data: Partial<IPost>) => await updatePost(data),
   });
 };
@@ -82,52 +59,64 @@ export const useUpdatePost = () => {
 // share post
 export const useCreateSharePost = () => {
   return useMutation<any, Error, any>({
-    mutationKey: ["POST"],
+    mutationKey: ['POST'],
     mutationFn: async (data: Partial<IPost>) => await createShare(data),
   });
 };
 
 export const useUpdateLikeStatus = () => {
   return useMutation<any, Error, any>({
-    mutationKey: ["POST"],
+    mutationKey: ['POST'],
     mutationFn: async (data: Record<string, unknown>) =>
       await updateLikeStatus(data),
-    onError: (error) => {
-      // toast.error(error.message);
-    },
   });
 };
 
-export const useGetAllPosts = (offset?: number, limit?: number) => {
+export const useGetAllPosts = (params: { [key: string]: any }) => {
+  const cleanedParams = Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => value)
+  );
+
   return useQuery({
-    queryKey: ["POST"],
-    queryFn: async () => await getAllGardeningPosts(offset, limit),
-    // enabled: Number(offset) > 10,
+    queryKey: ['POST', cleanedParams],
+    queryFn: () => getAllGardeningPosts(cleanedParams),
+    refetchOnWindowFocus: false,
+  });
+};
+export const useGetSinglePost = (postId: string) => {
+  return useQuery({
+    queryKey: ['POST', postId],
+    queryFn: () => getSingleGardeningPost(postId),
   });
 };
 
-export const useGetSinglePost = (id: string) => {
+export const useGetUserSavedPosts = (params: { [key: string]: any }) => {
+  const cleanedParams = Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => value)
+  );
   return useQuery({
-    queryKey: ["POST", id],
-    queryFn: async () => await getSingleGardeningPost(id),
-    enabled: !!id,
-  });
-};
-
-export const useGetUserSavedPosts = (userId: string) => {
-  return useQuery({
-    queryKey: ["WISHLIST", userId],
+    queryKey: ['WISHLIST', params?.user, cleanedParams],
     queryFn: async () => {
-      return await getUserSavedPostCollection(userId);
+      return await getUserSavedPostCollection(cleanedParams);
     },
-    enabled: !!userId,
+    refetchOnWindowFocus: false,
+  });
+};
+// get all share posts
+export const useGetAllSharePosts = () => {
+  return useQuery({
+    queryKey: ['SHARE_POST'],
+    queryFn: async () => {
+      return await getAllSharePosts();
+    },
   });
 };
 
-export const useGetUserPost = (id: string) => {
+export const useGetTopGardeners = () => {
   return useQuery({
-    queryKey: ["POST"],
-    queryFn: async () => await getUserGardeningPost(id),
-    enabled: !!id,
+    queryKey: ['POST', 'USER'],
+    queryFn: async () => {
+      return await getTopGardeners();
+    },
   });
 };

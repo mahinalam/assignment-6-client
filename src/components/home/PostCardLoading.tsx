@@ -1,11 +1,11 @@
-import { Skeleton } from "@nextui-org/react";
+import { Skeleton } from '@nextui-org/react';
 
 const PostCardSkeleton = () => {
   return (
     <div className="space-y-4 mt-1 md:w-[80%] w-full mx-auto h-auto">
       {/* User Info */}
       <div className="flex items-center gap-3">
-        <Skeleton className="rounded-full" width={40} height={40} />
+        <Skeleton className="rounded-full size-[160px]" />
         <div className="space-y-1">
           <Skeleton className="h-4 w-32 rounded-md" />
           <Skeleton className="h-3 w-20 rounded-md" />

@@ -1,43 +1,71 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 
-import React from "react";
-import { Button } from "@nextui-org/button";
+import React from 'react';
+import { Button } from '@nextui-org/button';
 
 const FollowerCard = ({
   item,
   status,
-  removeFollower,
+  handleRemoveFollower,
+  handleUnfollowUser,
+  handleUnfollowFollowingUserModalOpen,
 }: {
   item: Record<string, any>;
-  status: string;
-  removeFollower: (followerId: string) => void;
+  status: 'follower' | 'following';
+  handleRemoveFollower?: any;
+  isFollowing: boolean;
+  isOwnProfile: any;
+  handleUnfollowUser?: any;
+  handleUnfollowFollowingUserModalOpen?: any;
 }) => {
-  console.log("card", item);
-  const { _id, profilePhoto, name } = item;
-
   return (
-    <div className="mb-4">
-      <div className="flex items-center justify-between">
-        <section className="flex items-center gap-4">
-          <div>
-            <img
-              alt="Follower"
-              className="rounded-full size-[50px]"
-              src={profilePhoto}
-            />
-          </div>
-          <div>{name}</div>
-        </section>
-        <section>
-          <Button>
-            <span onClick={() => removeFollower(_id)}>
-              {status === "follower" ? "Remove" : "Following"}
-            </span>
-          </Button>
-        </section>
+    <>
+      <div className="mb-4">
+        <div className="flex items-center justify-between">
+          <section className="flex items-center gap-4">
+            <div>
+              <img
+                alt="Follower"
+                className="rounded-full size-[50px]"
+                src={
+                  status === 'following'
+                    ? item?.following?.profilePhoto
+                    : item?.follower?.profilePhoto
+                }
+              />
+            </div>
+            <div>
+              {status === 'following'
+                ? item?.following?.name
+                : item?.follower?.name}
+            </div>
+          </section>
+          <section>
+            {status === 'following' ? (
+              <Button
+                size="sm"
+                onClick={() =>
+                  handleUnfollowFollowingUserModalOpen(
+                    item?.following?._id,
+                    item?.following?.name
+                  )
+                }
+              >
+                <span>Following</span>
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => handleRemoveFollower(item?.follower?._id)}
+              >
+                <span>Remove</span>
+              </Button>
+            )}
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

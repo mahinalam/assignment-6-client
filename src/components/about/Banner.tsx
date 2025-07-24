@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const Banner = () => {
   return (
@@ -7,7 +7,7 @@ const Banner = () => {
      overflow-hidden"
       style={{
         backgroundImage:
-          "url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTz0XciPxu38BNsmzP0nyqlnDnq7IUosdjH3w&s')",
+          'url(\'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTz0XciPxu38BNsmzP0nyqlnDnq7IUosdjH3w&s\')',
       }}
     >
       {/* Gradient overlay */}

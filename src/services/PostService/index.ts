@@ -1,19 +1,17 @@
-"use server";
+'use server';
 
-import axiosInstance from "@/src/lib/AxiosInstance";
-import axios from "axios";
+import axiosInstance from '@/src/lib/AxiosInstance';
 
 export const createPost = async (formData: FormData): Promise<any> => {
   try {
-    const { data } = await axiosInstance.post("/gardening-posts", formData, {
+    const { data } = await axiosInstance.post('/gardening-posts', formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
 
     return data;
   } catch (error: any) {
-    console.log(error.message);
     throw new Error(error.message);
   }
 };
@@ -25,7 +23,6 @@ export const deletePost = async (id: string): Promise<any> => {
 
     return data;
   } catch (error: any) {
-    console.log(error.message);
     throw new Error(error.message);
   }
 };
@@ -42,55 +39,46 @@ export const deleteSavedPost = async (id: string): Promise<any> => {
 };
 
 export const createSavedPost = async (savedPostData: {
-  user: string;
   post: string;
 }): Promise<any> => {
   try {
-    const { data } = await axiosInstance.post("/saved-post", savedPostData);
+    const { data } = await axiosInstance.post('/wishlist', savedPostData);
 
     return data;
   } catch (error: any) {
-    console.log(error.message);
     throw new Error(error.message);
   }
 };
 
-// all posts
-export const getAllGardeningPosts = async (offset?: number, limit?: number) => {
+// services/blog.service.ts
+export const getAllGardeningPosts = async (params?: { [key: string]: any }) => {
+  const queryString = new URLSearchParams(params).toString();
+  const url = `/gardening-posts${queryString ? `?${queryString}` : ''}`;
+
   try {
-    const { data } = await axiosInstance.get(`/gardening-posts`);
+    const { data } = await axiosInstance.get(url);
     return data;
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(error.message || 'Failed to fetch posts');
   }
 };
 
 // single post
 export const getSingleGardeningPost = async (id: string) => {
-  console.log("params id", id);
   try {
     const { data } = await axiosInstance.get(`/gardening-posts/${id}`);
-    console.log("data", data);
     return data;
   } catch (error: any) {
     throw new Error(error);
   }
 };
 
-export const getUserSavedPostCollection = async (id: string) => {
-  console.log("from hook", id);
+export const getUserSavedPostCollection = async (params?: {
+  [key: string]: any;
+}) => {
+  const searchParams = new URLSearchParams(params).toString();
   try {
-    const { data } = await axiosInstance.get(`/wishlist?user=${id}`);
-
-    return data;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-};
-
-export const getUserGardeningPost = async (id: string) => {
-  try {
-    const { data } = await axiosInstance.get(`/gardening-posts?user=${id}`);
+    const { data } = await axiosInstance.get(`/wishlist?${searchParams}`);
 
     return data;
   } catch (error: any) {
@@ -104,7 +92,7 @@ export const updatePost = async (
 ): Promise<any> => {
   try {
     const { data } = await axiosInstance.put(
-      `/gardening-posts/`,
+      '/gardening-posts/',
       updatedPostdata
     );
 
@@ -117,10 +105,9 @@ export const updatePost = async (
 export const updateLikeStatus = async (
   likeStatusData: Record<string, unknown>
 ): Promise<any> => {
-  console.log("likeStatusData", likeStatusData);
   try {
     const { data } = await axiosInstance.patch(
-      `/gardening-posts`,
+      '/gardening-posts',
       likeStatusData
     );
 
@@ -134,11 +121,30 @@ export const createShare = async (
   payload: Record<string, unknown>
 ): Promise<any> => {
   try {
-    console.log("payload from server", payload);
-    const { data } = await axiosInstance.post(`/share`, payload);
+    const { data } = await axiosInstance.post('/share', payload);
 
     return data;
   } catch (error: any) {
     throw new Error(error.message);
+  }
+};
+
+// get share posts
+export const getAllSharePosts = async () => {
+  try {
+    const { data } = await axiosInstance.get('/share');
+    return data;
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to fetch share posts');
+  }
+};
+
+export const getTopGardeners = async () => {
+  try {
+    const { data } = await axiosInstance.get('/gardening-posts/top-gardeners');
+
+    return data;
+  } catch (error: any) {
+    throw new Error(error);
   }
 };

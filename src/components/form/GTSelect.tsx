@@ -42,11 +42,11 @@
 //   );
 // }
 
-"use client";
+'use client';
 
-import { IInput } from "@/src/types";
-import { Select, SelectItem } from "@nextui-org/select";
-import { useFormContext } from "react-hook-form";
+import { IInput } from '@/src/types';
+import { Select, SelectItem } from '@nextui-org/select';
+import { useFormContext } from 'react-hook-form';
 
 // import { IInput } from "@/types";
 
@@ -62,7 +62,7 @@ export default function GTSelect({
   options,
   name,
   label,
-  variant = "bordered",
+  variant = 'bordered',
   disabled,
   id,
   defaultSelectedKeys,

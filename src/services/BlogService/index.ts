@@ -1,18 +1,17 @@
-"use server";
+'use server';
 
-import axiosInstance from "@/src/lib/AxiosInstance";
+import axiosInstance from '@/src/lib/AxiosInstance';
 
 export const createBlog = async (formData: FormData): Promise<any> => {
   try {
-    const { data } = await axiosInstance.post("/blogs", formData, {
+    const { data } = await axiosInstance.post('/blogs', formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
 
     return data;
   } catch (error: any) {
-    console.log(error.message);
     throw new Error(error.message);
   }
 };
@@ -22,18 +21,20 @@ export const deleteBlog = async (id: string): Promise<any> => {
     const { data } = await axiosInstance.delete(`/blogs/${id}`);
     return data;
   } catch (error: any) {
-    console.log(error.message);
     throw new Error(error.message);
   }
 };
 
-export const getAllBlogs = async (offset?: number, limit?: number) => {
-  try {
-    const { data } = await axiosInstance(`/blogs`);
+// services/blog.service.ts
+export const getAllBlogs = async (params?: { [key: string]: any }) => {
+  const queryString = new URLSearchParams(params).toString();
+  const url = `/blogs${queryString ? `?${queryString}` : ''}`;
 
+  try {
+    const { data } = await axiosInstance.get(url);
     return data;
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(error.message || 'Failed to fetch blogs');
   }
 };
 
@@ -49,7 +50,7 @@ export const getSingleBlog = async (blogId: string) => {
 
 export const getUserBlogs = async () => {
   try {
-    const { data } = await axiosInstance.get(`/blogs/user-blogs`);
+    const { data } = await axiosInstance.get('/blogs/user-blogs');
 
     return data;
   } catch (error: any) {
@@ -62,7 +63,7 @@ export const updateBlog = async (
   updatedPostdata: Record<string, unknown>
 ): Promise<any> => {
   try {
-    const { data } = await axiosInstance.put(`/blogs`, updatedPostdata);
+    const { data } = await axiosInstance.put('/blogs', updatedPostdata);
 
     return data;
   } catch (error: any) {

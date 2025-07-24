@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Table,
@@ -14,12 +14,12 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-} from "@nextui-org/react";
-import React, { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useDeletePayment, useGetAllPayments } from "@/src/hooks/payment.hook";
-import { toast } from "sonner";
-import moment from "moment";
+} from '@nextui-org/react';
+import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDeletePayment, useGetAllPayments } from '@/src/hooks/payment.hook';
+import { toast } from 'sonner';
+import moment from 'moment';
 
 const ManagePaymentHistory = () => {
   const queryClient = useQueryClient();
@@ -36,7 +36,6 @@ const ManagePaymentHistory = () => {
   const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
 
   const { data: paymentData, isLoading: paymentLoading } = useGetAllPayments();
-  console.log("payment data", paymentData);
 
   if (paymentLoading) {
     return <div>Loading...</div>;
@@ -47,12 +46,12 @@ const ManagePaymentHistory = () => {
       deletePayment(deleteModalId, {
         onSuccess: (res) => {
           if (res?.success) {
-            toast.success("Payment deleted successfully.");
-            queryClient.invalidateQueries({ queryKey: ["PAYMENT"] });
+            toast.success('Payment deleted successfully.');
+            queryClient.invalidateQueries({ queryKey: ['PAYMENT'] });
           }
         },
         onError: (error) => {
-          toast.error("Failed to delete payment");
+          toast.error('Failed to delete payment');
         },
       });
       onClose(); //   }
@@ -86,17 +85,21 @@ const ManagePaymentHistory = () => {
               <TableRow key={item?._id}>
                 <TableCell>{item?.userId?.email}</TableCell>
                 <TableCell>
-                  {" "}
+                  {' '}
                   {item?.createdAt
-                    ? moment(item.createdAt).format("MMMM D YYYY")
-                    : ""}
+                    ? moment(item.createdAt).format('MMMM D YYYY')
+                    : ''}
                 </TableCell>
                 <TableCell>{item?.transactionId}</TableCell>
                 <TableCell>{item?.totalPrice}</TableCell>
                 <TableCell>{item?.currency}</TableCell>
                 <TableCell>
                   <span
-                    className={`${item.paymentStatus === "paid" ? "text-green-500" : "text-red-500"} font-bold`}
+                    className={`${
+                      item.paymentStatus === 'paid'
+                        ? 'text-green-500'
+                        : 'text-red-500'
+                    } font-bold`}
                   >
                     {item?.paymentStatus}
                   </span>

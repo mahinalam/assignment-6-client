@@ -1,27 +1,25 @@
-"use client";
+'use client';
 
-import { Modal, ModalContent, ModalBody, Button } from "@nextui-org/react";
+import { Modal, ModalContent, ModalBody, Button } from '@nextui-org/react';
 
-import GTInput from "../form/GTInput";
-import GTForm from "../form/GTForm";
-import GTTextArea from "../form/GTTextArea";
-import GTSelect from "../form/GTSelect";
-import { ICategory, IPost } from "@/src/types";
-import { useGetAllCategories } from "@/src/hooks/category.hook";
-import GTQuill from "../form/GTQuill";
+import GTInput from '../form/GTInput';
+import GTForm from '../form/GTForm';
+import GTSelect from '../form/GTSelect';
+import { IBlog, ICategory } from '@/src/types';
+import { useGetAllCategories } from '@/src/hooks/category.hook';
+import GTQuill from '../form/GTQuill';
 
 interface IProps {
   isOpen: any;
   onOpenChange: any;
-  productData: any;
+  productData?: any;
   editProductImages: any;
   imageFiles: any;
   setImageFiles: any;
   handleUpdateProduct: any;
-  updateProductLoadingName: any;
   handleDeleteNewProductImages: any;
-  editProductLoading: boolean;
-  defaultValue: IPost;
+  editProductLoading?: boolean;
+  defaultValue: IBlog;
   modalTitle: string;
   modalBtn: string;
 }
@@ -40,16 +38,16 @@ export default function EditProductModal({
 }: IProps) {
   const { data: categoriesData, isLoading: categoriesDataLoading } =
     useGetAllCategories();
-  console.log({ modalTitle });
-  if (categoriesDataLoading) {
-    return;
-  }
-  const categoriesOption = categoriesData?.data?.map((item: ICategory) => ({
-    key: item._id,
-    label: item.name,
-  }));
 
-  console.log("post edit", defaultValue);
+  if (categoriesDataLoading) {
+    return <p>Loading</p>;
+  }
+  const categoriesOption = categoriesData?.data?.data?.map(
+    (item: ICategory) => ({
+      key: item._id,
+      label: item.name,
+    })
+  );
 
   // fn for truncate image name
   const truncateFileName = (name: string, front = 6, back = 8) => {
@@ -57,7 +55,7 @@ export default function EditProductModal({
 
     return `${name.slice(0, front)}...${name.slice(-back)}`;
   };
-  const { _id, content, title, category } = defaultValue;
+  const { content, title, category } = defaultValue;
 
   // const categoriesOption =
 
@@ -98,15 +96,6 @@ export default function EditProductModal({
                               type="text"
                             />
                           </div>
-                          {/* <div className="py-3">
-                            <GTTextArea
-                              defaultValue={content}
-                              label="Content"
-                              name="content"
-                              type="text"
-                              rows={8}
-                            />
-                          </div> */}
                           <div className="py-3">
                             <GTQuill
                               label="Content"
@@ -172,7 +161,9 @@ export default function EditProductModal({
                             </p>
                             <label
                               aria-label="Upload Your Files"
-                              className={`flex cursor-pointer items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all`}
+                              className={
+                                'flex cursor-pointer items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all'
+                              }
                               htmlFor="image"
                             >
                               <div className="flex size-16 items-center justify-center rounded-full bg-athens-gray-50">
@@ -216,7 +207,7 @@ export default function EditProductModal({
                                     file,
                                   ]);
                                 }
-                                e.target.value = "";
+                                e.target.value = '';
                               }}
                             />
 

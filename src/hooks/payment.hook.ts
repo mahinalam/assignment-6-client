@@ -1,51 +1,46 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from '@tanstack/react-query';
+
+import { createComment } from '../services/CommentService';
 import {
   deletePayment,
   getAllPayments,
-  getAllUserPayments,
   isUserVerified,
-} from "../services/paymentService";
+} from '../services/paymentService';
 
-export const useGetAllPayments = (params?: { userId?: string }) => {
-  return useQuery({
-    queryKey: ["PAYMENT", params?.userId],
-    queryFn: async () => {
-      // Conditionally call getAllPayments with or without params
-      if (params && params.userId) {
-        return await getAllPayments(params); // Call with params if provided
-      }
-
-      return await getAllPayments(); // Call without params if not provided
-    },
-    // enabled: !!params?.userId,
+export const useCreateComment = () => {
+  return useMutation<any, Error, any>({
+    mutationKey: ['COMMENTS'],
+    mutationFn: async (commentData) => await createComment(commentData),
+  });
+};
+export const useDeletePayment = () => {
+  return useMutation<any, Error, any>({
+    mutationKey: ['PAYMENT'],
+    mutationFn: async (paymentId) => await deletePayment(paymentId),
   });
 };
 
-// get user's payment
-export const useGetAllUserPayments = (userId: string) => {
+// export const useGetAllPayments = () => {
+//   return useQuery({
+//     queryKey: ["PAYMENT"],
+//     queryFn: async () => await getAllPayments(),
+//   });
+// };
+// hooks/payment.hook.ts
+
+export const useGetAllPayments = (params?: { [key: string]: any }) => {
   return useQuery({
-    queryKey: ["PAYMENT", userId],
-    queryFn: async () => {
-      return await getAllUserPayments(userId);
-    },
-    enabled: !!userId,
+    queryKey: ['PAYMENT', params], // important for caching and refetching
+    queryFn: async () => await getAllPayments(params),
   });
 };
 
 // check is user verified
 export const useIsUserVerified = () => {
   return useQuery({
-    queryKey: ["PAYMENT"],
+    queryKey: ['PAYMENT'],
     queryFn: async () => {
       return await isUserVerified();
     },
-  });
-};
-
-// delete payment
-export const useDeletePayment = () => {
-  return useMutation<any, Error, any>({
-    mutationKey: ["PAYMENT"],
-    mutationFn: async (id: string) => await deletePayment(id),
   });
 };

@@ -1,14 +1,14 @@
-import "@/src/styles/globals.css";
+import '@/src/styles/globals.css';
 
-import { Metadata, Viewport } from "next";
-import clsx from "clsx";
+import { Metadata, Viewport } from 'next';
+import clsx from 'clsx';
 
-import { Providers } from "../lib/Providers";
+import { Providers } from '../lib/Providers';
 
-import { siteConfig } from "@/src/config/site";
-import { fontSans } from "@/src/config/fonts";
-import { getCurrentUser } from "../services/AuthService";
-import { redirect } from "next/navigation";
+import { siteConfig } from '@/src/config/site';
+import { fontSans } from '@/src/config/fonts';
+import { getCurrentUser } from '../services/AuthService';
+import { redirect } from 'next/navigation';
 // import { Providers } from "../redux/Provider";
 
 export const metadata: Metadata = {
@@ -18,14 +18,14 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   icons: {
-    icon: "/favicon.ico",
+    icon: '/favicon.ico',
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
   ],
 };
 
@@ -39,11 +39,11 @@ export default async function RootLayout({
       <head />
       <body
         className={clsx(
-          "min-h-screen bg-background font-sans antialiased",
+          'min-h-screen bg-background font-sans antialiased',
           fontSans.variable
         )}
       >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
+        <Providers themeProps={{ attribute: 'class', defaultTheme: 'light' }}>
           {children}
         </Providers>
       </body>

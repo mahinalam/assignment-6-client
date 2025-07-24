@@ -1,23 +1,23 @@
-"use client";
-import { IPost } from "@/src/types";
-import { FiEdit3 } from "react-icons/fi";
-import { AiOutlineDelete } from "react-icons/ai";
-import React, { useState } from "react";
-import Link from "next/link";
-import DeleteModal from "../modal/DeleteModal";
-import { useDisclosure } from "@nextui-org/modal";
-import { useDeletePost, useUpdatePost } from "@/src/hooks/post.hook";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import EditProductModal from "../modal/EditPostModal";
-import { SlLike } from "react-icons/sl";
-import { SlDislike } from "react-icons/sl";
-import { FaRegCommentDots } from "react-icons/fa";
+'use client';
+import { IPost } from '@/src/types';
+import { FiEdit3 } from 'react-icons/fi';
+import { AiOutlineDelete } from 'react-icons/ai';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import DeleteModal from '../modal/DeleteModal';
+import { useDisclosure } from '@nextui-org/modal';
+import { useDeletePost, useUpdatePost } from '@/src/hooks/post.hook';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import EditProductModal from '../modal/EditPostModal';
+import { SlLike } from 'react-icons/sl';
+import { SlDislike } from 'react-icons/sl';
+import { FaRegCommentDots } from 'react-icons/fa';
+import moment from 'moment';
 
 const PostCard = ({ post }: { post: IPost }) => {
-  console.log({ post });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const { _id, images, title, content, user } = post;
+  const { _id, images, title, content, user, createdAt, status } = post;
   const { mutate } = useDeletePost();
   const { mutate: updatePost } = useUpdatePost();
   const queryClient = useQueryClient();
@@ -50,16 +50,16 @@ const PostCard = ({ post }: { post: IPost }) => {
 
   // delete post
   const handleDeletePost = () => {
-    const id = toast.loading("Deleting post...");
+    const id = toast.loading('Deleting post...');
     if (_id) {
       mutate(_id, {
         onSuccess: () => {
-          ("");
-          queryClient.invalidateQueries({ queryKey: ["POST"] });
-          toast.success("Post deleted successfully", { id });
+          ('');
+          queryClient.invalidateQueries({ queryKey: ['POST', _id] });
+          toast.success('Post deleted successfully', { id });
         },
         onError: (error) => {
-          toast.error(error?.message || "Failed to delete post!", { id });
+          toast.error(error?.message || 'Failed to delete post!', { id });
         },
       });
     }
@@ -67,30 +67,27 @@ const PostCard = ({ post }: { post: IPost }) => {
 
   // update post
   const handleUpdatePost = (data: Partial<IPost>) => {
-    console.log("qul data", data);
-    const id = toast.loading("Updating post...");
+    const id = toast.loading('Updating post...');
     const formData = new FormData();
     const postData = {
       postId: _id,
       ...data,
     };
-    console.log({ postData });
-    formData.append("data", JSON.stringify(postData));
+    formData.append('data', JSON.stringify(postData));
     if (imageFiles.length > 0) {
-      for (let image of imageFiles) {
-        formData.append("itemImages", image);
+      for (const image of imageFiles) {
+        formData.append('itemImages', image);
       }
     }
 
     updatePost(formData, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["POST"] });
-        toast.success("Post updated successfully", { id });
+        queryClient.invalidateQueries({ queryKey: ['POST'] });
+        toast.success('Post updated successfully', { id });
         onEditModalOPenChange();
       },
       onError: (error) => {
-        console.log({ error });
-        toast.error(error?.message || "Failed to update post!", { id });
+        toast.error(error?.message || 'Failed to update post!', { id });
       },
     });
   };
@@ -103,14 +100,22 @@ const PostCard = ({ post }: { post: IPost }) => {
           {/* User Info */}
           <div className="flex items-center gap-3">
             <img
-              src={user?.profilePhoto || "/default-avatar.png"}
-              alt={user?.name || "User"}
+              src={user?.profilePhoto || '/default-avatar.png'}
+              alt={user?.name || 'User'}
               className="w-10 h-10 rounded-full object-cover border"
             />
             <div className="text-sm">
               <p className="font-semibold text-gray-800">{user?.name}</p>
-              <p className="text-gray-500 text-xs">10 months ago</p>
-              <p className="text-green-600 text-xs font-medium">Published</p>
+              <p className="text-gray-500 text-xs">
+                {moment(createdAt).fromNow()}
+              </p>
+              <p
+                className={`text-xs font-medium ${
+                  status === 'published' ? 'text-primary' : 'text-red-600'
+                } `}
+              >
+                {status}
+              </p>
             </div>
           </div>
 
@@ -156,26 +161,6 @@ const PostCard = ({ post }: { post: IPost }) => {
             />
           </div>
         </Link>
-        {/* Footer with Like, Dislike, and Comment */}
-
-        <div className="px-4 pb-4 mt-2">
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <SlLike size={20} />
-                <span className="text-lg">1</span>
-              </div>
-              <div className="flex items-center pl-4 gap-2">
-                <SlDislike size={20} />
-                <span className="text-lg">1</span>
-              </div>
-            </div>
-            <div className="flex items-center pl-4 gap-2">
-              <FaRegCommentDots size={20} />
-              <span className="text-lg">1</span>
-            </div>
-          </div>
-        </div>
       </div>
       <DeleteModal
         handleDeleteProduct={handleDeletePost}
@@ -190,7 +175,7 @@ const PostCard = ({ post }: { post: IPost }) => {
         onOpenChange={onEditModalOPenChange}
         handleUpdateProduct={handleUpdatePost}
         editProductImages={images}
-        defaultValue={post}
+        defaultValue={post as any}
         handleDeleteNewProductImages={handleDeleteImage}
         imageFiles={imageFiles}
         setImageFiles={setImageFiles}

@@ -1,12 +1,12 @@
-import { Button } from "@nextui-org/button";
+import { Button } from '@nextui-org/button';
 import {
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-} from "@nextui-org/react";
-import React from "react";
+} from '@nextui-org/react';
+import React from 'react';
 
 interface IProps {
   isOpen: boolean;

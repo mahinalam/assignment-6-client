@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { useUser } from "@/src/context/user.provider";
-import { logout } from "@/src/services/AuthService";
-import { Button } from "@nextui-org/button";
-import Link from "next/link";
-import Loading from "../UI/Loading";
+import { useUser } from '@/src/context/user.provider';
+import { logout } from '@/src/services/AuthService';
+import { Button } from '@nextui-org/button';
+import Link from 'next/link';
+import Loading from '../UI/Loading';
 
 interface SidebarProps {
   setActiveSection: (section: string) => void;
@@ -30,7 +30,7 @@ export const UserSidebar: React.FC<SidebarProps> = ({
       <div className=" flex justify-between items-center h-[50px] gap-4 mb-4">
         <div>
           <Link href="/">
-            {" "}
+            {' '}
             <h2 className="text-lg font-bold mb-6">Green Haven</h2>
           </Link>
         </div>
@@ -43,10 +43,10 @@ export const UserSidebar: React.FC<SidebarProps> = ({
 
       <Link
         className={`block w-full text-left p-2 rounded-md mb-2 ${
-          activeSection === "managePosts" ? "bg-blue-600" : "bg-transparent"
+          activeSection === 'managePosts' ? 'bg-blue-600' : 'bg-transparent'
         }`}
         href="/dashboard/user/my-post"
-        onClick={() => setActiveSection("myPosts")}
+        onClick={() => setActiveSection('myPosts')}
       >
         My Posts
       </Link>
@@ -54,18 +54,18 @@ export const UserSidebar: React.FC<SidebarProps> = ({
       <Link
         href="/profile/create-post"
         className={`block w-full text-left p-2 rounded-md mb-2 ${
-          activeSection === "createPost" ? "bg-blue-600" : "bg-transparent"
+          activeSection === 'createPost' ? 'bg-blue-600' : 'bg-transparent'
         }`}
-        onClick={() => setActiveSection("createPost")}
+        onClick={() => setActiveSection('createPost')}
       >
         Create Post
       </Link>
       <Link
         className={`block w-full text-left p-2 rounded-md mb-2 ${
-          activeSection === "managePosts" ? "bg-blue-600" : "bg-transparent"
+          activeSection === 'managePosts' ? 'bg-blue-600' : 'bg-transparent'
         }`}
         href={`/profile/${user?._id}`}
-        onClick={() => setActiveSection("myPosts")}
+        onClick={() => setActiveSection('myPosts')}
       >
         Profile
       </Link>
@@ -89,10 +89,10 @@ export const UserSidebar: React.FC<SidebarProps> = ({
       </Link> */}
       <Link
         className={`block w-full text-left p-2 rounded-md mb-2 ${
-          activeSection === "paymentsHistory" ? "bg-blue-600" : "bg-transparent"
+          activeSection === 'paymentsHistory' ? 'bg-blue-600' : 'bg-transparent'
         }`}
         href="/dashboard/user/payment-history"
-        onClick={() => setActiveSection("paymentHistory")}
+        onClick={() => setActiveSection('paymentHistory')}
       >
         Payment History
       </Link>

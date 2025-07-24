@@ -1,13 +1,13 @@
-"use server";
+'use server';
 
-import axiosInstance from "@/src/lib/AxiosInstance";
+import axiosInstance from '@/src/lib/AxiosInstance';
 
 // follow user
 export const followUser = async (
   userInfo: Record<string, unknown>
 ): Promise<any> => {
   try {
-    const { data } = await axiosInstance.post("/follow/follow-user", userInfo);
+    const { data } = await axiosInstance.post('/follow/follow-user', userInfo);
 
     return data;
   } catch (error: any) {
@@ -21,7 +21,22 @@ export const unFollowUser = async (
 ): Promise<any> => {
   try {
     const { data } = await axiosInstance.post(
-      "/follow/unfollow-user",
+      '/follow/unfollow-user',
+      userInfo
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+// remove follower
+export const removeFollower = async (
+  userInfo: Record<string, unknown>
+): Promise<any> => {
+  try {
+    const { data } = await axiosInstance.post(
+      '/follow/remove-follower',
       userInfo
     );
 
@@ -32,21 +47,9 @@ export const unFollowUser = async (
 };
 
 // get followers
-export const getFollowers = async () => {
+export const getFollowersAndFollwingUser = async (userId: string) => {
   try {
-    const { data } = await axiosInstance.get(`/follow/follow-user`);
-
-    return data;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-};
-
-// get following users
-export const getFollowingUsers = async () => {
-  try {
-    const { data } = await axiosInstance.get(`/follow/following-user`);
-
+    const { data } = await axiosInstance.get(`/follow/followers/${userId}`);
     return data;
   } catch (error: any) {
     throw new Error(error);

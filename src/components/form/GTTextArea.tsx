@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { IInput } from "@/src/types";
-import { Textarea } from "@nextui-org/input";
-import { useFormContext } from "react-hook-form";
+import { IInput } from '@/src/types';
+import { Textarea } from '@nextui-org/input';
+import { useFormContext } from 'react-hook-form';
 
 // import { IInput } from "@/src/types";
 
@@ -11,14 +11,14 @@ interface IProps extends IInput {
 }
 
 export default function GTTextArea({
-  variant = "bordered",
-  size = "md",
+  variant = 'bordered',
+  size = 'md',
   required = false,
-  type = "text",
+  type = 'text',
   label,
   name,
   id,
-  defaultValue = "",
+  defaultValue = '',
   rows,
 }: IProps) {
   const {
@@ -30,9 +30,9 @@ export default function GTTextArea({
     <Textarea
       {...register(name)}
       defaultValue={defaultValue}
-      errorMessage={errors[name] ? (errors[name].message as string) : ""}
+      errorMessage={errors?.[name] ? (errors?.[name]?.message as string) : ''}
       id={id}
-      isInvalid={!!errors[name]}
+      isInvalid={!!errors?.[name]}
       label={label}
       maxRows={rows}
       minRows={8}

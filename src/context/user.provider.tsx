@@ -6,10 +6,10 @@ import {
   useContext,
   useEffect,
   useState,
-} from "react";
+} from 'react';
 
-import { getCurrentUser } from "../services/AuthService";
-import { IUser } from "../types";
+import { getCurrentUser } from '../services/AuthService';
+import { IUser } from '../types';
 
 const UserContext = createContext<IUserProviderValues | undefined>(undefined);
 
@@ -46,7 +46,7 @@ export const useUser = () => {
   const context = useContext(UserContext);
 
   if (context === undefined) {
-    throw new Error("useUser must be used within the UserProvider context");
+    throw new Error('useUser must be used within the UserProvider context');
   }
 
   return context;

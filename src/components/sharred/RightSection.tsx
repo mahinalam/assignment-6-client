@@ -1,40 +1,48 @@
-"use client";
-import React, { useState } from "react";
-import Link from "next/link";
-import { useUser } from "@/src/context/user.provider";
-import SuggesstedCard from "./SuggesstedCard";
-import { logout } from "@/src/services/AuthService";
-import { useRouter } from "next/navigation";
-import { useGetAllPosts } from "@/src/hooks/post.hook";
-import { IPost } from "@/src/types";
-import { useGetSingleUser } from "@/src/hooks/auth.hook";
-import { LuUserRound } from "react-icons/lu";
+'use client';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useUser } from '@/src/context/user.provider';
+import SuggesstedCard from './SuggesstedCard';
+import { logout } from '@/src/services/AuthService';
+import { useRouter } from 'next/navigation';
+import { useGetAllPosts } from '@/src/hooks/post.hook';
+import { IPost } from '@/src/types';
+import { useGetSingleUser } from '@/src/hooks/auth.hook';
+import { LuUserRound } from 'react-icons/lu';
+import { toast } from 'sonner';
 
 const RightSection = () => {
-  const { user, setIsLoading } = useUser();
+  const { user, setIsLoading, setUser } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const { data: currentUserInfo } = useGetSingleUser();
+  const { data: currentUserInfo } = useGetSingleUser(user?._id as string);
+  const [page] = useState(1);
+  const limit = 5;
 
-  const { data: postsData, isLoading, isSuccess } = useGetAllPosts();
+  const {
+    data: postsData,
+    isLoading,
+    isSuccess,
+  } = useGetAllPosts({ page, limit });
 
-  if (isLoading) {
-    return <p>Loading</p>;
-  }
-
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
     setIsLoading(true);
-    router.push("/login");
-  };
 
-  console.log({ postsData });
+    await logout();
+    setUser(null);
+    toast.success(`${user?.name} logged out successfully!`);
+    router.push('/login');
+  };
   return (
-    <div className="relative cursor-pointer">
+    <div className="relative ">
       {/* profile image section */}
-      <div
-        onClick={() => setIsOpen((val) => !val)}
-        className="flex gap-2 items-center"
+      <Link
+        href={
+          user?.role === 'USER'
+            ? `/profile/${user?._id}`
+            : '/profile/edit-profile'
+        }
+        className="inline-flex gap-2 items-center cursor-pointer"
       >
         <div className="">
           {currentUserInfo?.data?.profilePhoto ? (
@@ -48,65 +56,24 @@ const RightSection = () => {
           )}
         </div>
         <div>
-          <p className="lg:text-sm">mahinalam@gmail.com</p>
-          <p className="text-subTitle ">Mahin</p>
+          <p className="lg:text-sm">{currentUserInfo?.data?.email}</p>
+          <p className="text-subTitle ">{currentUserInfo?.data?.name}</p>
         </div>
+      </Link>
 
-        {/* <p className="ml-2 font-extralight ">1d</p> */}
-      </div>
-
-      {/* suggessted people */}
+      {/* suggessted posts */}
       <div>
         <p className="lg:text-lg w-[80%] border-b-4 border-b-border text-subTitle lg:mt-8 mb-5 pb-2">
           Recent Posts
         </p>
         {!isLoading &&
           isSuccess &&
-          postsData?.data?.slice(0, 5)?.map((post: IPost) => (
-            <Link href={`/posts/${post._id}`} key={post._id}>
+          postsData?.data?.data?.slice(0, 5)?.map((post: IPost) => (
+            <Link href={`/posts/${post._id}`} className="" key={post._id}>
               <SuggesstedCard title={post.title} />
             </Link>
           ))}
       </div>
-      {isOpen && (
-        <div className="absolute  z-50  bg-white rounded-xl shadow-md w-[40vw] md:w-[10vw]  overflow-hidden  top-14 text-sm">
-          <div className="flex flex-col pl-4 cursor-pointer">
-            <>
-              <Link
-                className=" text-black -4 py-2 hover:bg-neutral-100 transition font-semibold"
-                href={`/profile/${user?._id}`}
-              >
-                Profile
-              </Link>
-              <Link
-                href="/dashboard"
-                className=" text-black -4 py-2 hover:bg-neutral-100 transition font-semibold"
-              >
-                Dashboard
-              </Link>
-
-              <Link
-                href="/dashboard/user/wishlist"
-                className=" text-black -4 py-2 hover:bg-neutral-100 transition font-semibold"
-              >
-                Saved Post
-              </Link>
-              <Link
-                href="/"
-                className=" text-black -4 py-2 hover:bg-neutral-100 transition font-semibold"
-              >
-                Premium Subscription
-              </Link>
-              <span
-                className=" text-red-500  py-2 hover:bg-neutral-100 transition font-semibold"
-                onClick={handleLogout}
-              >
-                Logout
-              </span>
-            </>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

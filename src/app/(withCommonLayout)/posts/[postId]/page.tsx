@@ -1,105 +1,49 @@
-// "use client";
-// import React from "react";
-
-// import { useGetAllPosts, useGetSinglePost } from "@/src/hooks/post.hook";
-// import Container from "@/src/components/Container";
-// import moment from "moment";
-// import RecentPost from "@/src/components/posts/RecentPost";
-// // import { getSingleGardeningPost } from "@/src/services/CategoryService";
-
-// const PostPage = ({ params }: { params: { postId: string } }) => {
-//   const { data: singlePost } = useGetSinglePost(params?.postId);
-//   console.log({ singlePost });
-
-//   // const { data: postsData, isLoading } = useGetAllPosts();
-//   // const singlePost = postsData?.data?.filter(
-//   //   (item: any) => item._id === params.postId
-//   // )[0];
-//   // console.log(singlePost);
-//   // if (isLoading) {
-//   //   return <p>Loading...</p>;
-//   // }
-//   return (
-//     <div className="w-[90%] mx-auto flex gap-8">
-//       <section className="">
-//         <div className="flex items-center gap-8">
-//           <p> by {singlePost?.data?.user?.name}</p>
-//           <p className="text-[#B9A569] ">
-//             Posted on{" "}
-//             {moment(singlePost?.data?.createdAt).format("MMMM D YYYY")}
-//           </p>
-//         </div>
-
-//         {/* Images Section */}
-//         {singlePost?.data?.images?.length > 0 && (
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-//             {singlePost.data.images.map((image: string, index: number) => (
-//               <img
-//                 key={index}
-//                 src={image}
-//                 // alt={`Post Image ${index + 1}`}
-//                 // alt="image"
-//                 alt=""
-//                 className="w-full h-auto rounded-lg shadow-md"
-//               />
-//             ))}
-//           </div>
-//         )}
-
-//         {/* Post Content */}
-//         <div
-//           className="post-content mt-6 text-gray-800 leading-relaxed"
-//           dangerouslySetInnerHTML={{ __html: singlePost?.data?.content }}
-//         />
-//       </section>
-//     </div>
-//   );
-// };
-
-// export default PostPage;
-
-"use client";
-import React, { useState } from "react";
+'use client';
+import React, { useState } from 'react';
 
 import {
+  useCreateSavedPost,
   useCreateSharePost,
   useGetAllPosts,
   useGetSinglePost,
   useGetUserSavedPosts,
-} from "@/src/hooks/post.hook";
-import Container from "@/src/components/Container";
-import moment from "moment";
-import RecentPost from "@/src/components/posts/RecentPost";
-import Link from "next/link";
-import { useCreateComment, useGetAllComments } from "@/src/hooks/comment.hook";
-import { useUser } from "@/src/context/user.provider";
-import { useCreateReact, useGetPostReacts } from "@/src/hooks/react.hook";
-import { Input } from "@nextui-org/input";
-import { useQueryClient } from "@tanstack/react-query";
+} from '@/src/hooks/post.hook';
+import Container from '@/src/components/Container';
+import moment from 'moment';
+import RecentPost from '@/src/components/posts/RecentPost';
+import Link from 'next/link';
+import { useCreateComment, useGetAllComments } from '@/src/hooks/comment.hook';
+import { useUser } from '@/src/context/user.provider';
+import { useCreateReact, useGetPostReacts } from '@/src/hooks/react.hook';
+import { Input } from '@nextui-org/input';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Modal,
   ModalBody,
   ModalContent,
   ModalHeader,
   useDisclosure,
-} from "@nextui-org/modal";
-import CommentCard from "@/src/components/CommentCard";
-import { IoShareSocialOutline } from "react-icons/io5";
-import { IUser } from "@/src/types";
-import ShareModal from "@/src/components/modal/ShareModal";
-import { toast } from "sonner";
-import { useGetSingleUser } from "@/src/hooks/auth.hook";
-import Loading from "./loading";
-import RightSection from "@/src/components/sharred/RightSection";
+} from '@nextui-org/modal';
+import CommentCard from '@/src/components/CommentCard';
+import { IoShareSocialOutline } from 'react-icons/io5';
+import { IPost, IUser } from '@/src/types';
+import ShareModal from '@/src/components/modal/ShareModal';
+import { toast } from 'sonner';
+import { useGetSingleUser } from '@/src/hooks/auth.hook';
+import Loading from './loading';
+import RightSection from '@/src/components/sharred/RightSection';
+import PostCard from '@/src/components/home/PostCard';
+import WishlistModal from '@/src/components/modal/WishlistModal';
+import { useRouter } from 'next/navigation';
+import PostDetailsLoading from '@/src/components/loading-skeleton/PostDetailsSkeleton';
 
 const PostDetails = ({ params }: { params: { postId: string } }) => {
   const { data: singlePost, isLoading } = useGetSinglePost(params?.postId);
   const queryClient = useQueryClient();
   const { mutate: handleCreateComment, isPending: createCommentPending } =
     useCreateComment();
-  console.log({ singlePost });
   const { user: currentUser } = useUser();
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutate: sharePostFn } = useCreateSharePost();
   const {
@@ -122,31 +66,44 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
     onOpenChange: onWishlistModalOpenChange,
   } = useDisclosure();
 
-  const { mutate: createReact } = useCreateReact();
+  const { mutate: createReact } = useCreateReact(params.postId);
 
   const { data: reactData, isLoading: reactLoading } = useGetPostReacts(
     params.postId
   );
 
-  const [text, setText] = useState("");
-  const { data: singleUser } = useGetSingleUser();
+  const [text, setText] = useState('');
+  const { data: singleUser } = useGetSingleUser(currentUser?._id as string);
 
   const { data: userSavedPosts, isLoading: savedPostLoading } =
-    useGetUserSavedPosts((currentUser as IUser)?._id, params.postId);
+    useGetUserSavedPosts({ user: currentUser?._id, post: params.postId });
 
-  if (isLoading || commentsDataLoading || reactLoading) {
-    return <Loading />;
+  const { data: recentPosts, isLoading: recentPostLoading } = useGetAllPosts({
+    page: 1,
+    limit: 5,
+  });
+
+  const { mutate: handleCreateSavedPost, isPending: createSavedPostPending } =
+    useCreateSavedPost(currentUser?._id as string);
+
+  const router = useRouter();
+
+  if (isLoading) {
+    return <PostDetailsLoading />;
   }
 
-  console.log({ commentsData });
   const allPostComments = commentsData?.data?.filter(
     (item: any) => item?.post?._id === params?.postId
+  );
+
+  const filterRecentPosts = recentPosts?.data?.data?.filter(
+    (post: IPost) => post?._id !== params.postId
   );
 
   const myOwnComments =
     allPostComments?.length > 0 &&
     allPostComments.filter((item: any) => item?.user?._id === currentUser?._id);
-  const { user } = singlePost?.data;
+  const user = singlePost?.data?.user;
 
   // for comment
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,20 +115,30 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
     setIsModalOpen(true); // Open modal
   };
 
-  // add to wishlist
+  const handleGoToWishlistPage = () => router.push('/dashboard/user/wishlist');
   const handleAddToWishlist = async () => {
-    try {
-      onWishlistModalOpen();
-      // const res = await addToWishlist({ productId: id }).unwrap();
-      // if (res?.success) onWishlistModalOpen();
-    } catch (error: any) {
-      // toast.error(error.data.message);
-    }
+    const data = {
+      post: params.postId,
+    };
+
+    await handleCreateSavedPost(data, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ['WISHLIST', currentUser?._id],
+        });
+        onWishlistModalOpen();
+      },
+      onError: (err: any) => {
+        if (err.message === 'Request failed with status code 409') {
+          toast.error('Saved post already exists.');
+        }
+      },
+    });
   };
 
   // create share fn
   const createSharePost = () => {
-    const id = toast.loading("Posting...");
+    const id = toast.loading('Posting...');
     const payload = {
       post: params.postId,
       user: user?._id,
@@ -180,7 +147,7 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
 
     sharePostFn(payload, {
       onSuccess: () => {
-        toast.success("Post shared successfully!", { id });
+        toast.success('Post shared successfully!', { id });
         onShareModalOpenChange();
       },
     });
@@ -200,10 +167,10 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
 
       handleCreateComment(commentInfo, {
         onSuccess: (res) => {
-          queryClient.invalidateQueries({ queryKey: ["COMMENTS"] });
+          queryClient.invalidateQueries({ queryKey: ['COMMENTS'] });
         },
       });
-      setComment(""); // Reset input after submission
+      setComment(''); // Reset input after submission
     }
   };
 
@@ -216,7 +183,7 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
 
     createReact(payload, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["REACT", params.postId] });
+        queryClient.invalidateQueries({ queryKey: ['REACT', params.postId] });
       },
     });
   };
@@ -225,10 +192,11 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
   const handleModalClose = () => {
     setIsModalOpen(false); // Close modal
   };
+
   return (
     <>
-      <div className="w-[80%] mx-auto flex">
-        <div className="w-9/12">
+      <div className="lg:w-[80%] mt-[110px] lg:mt-0 w-full mx-auto flex gap-0 lg:gap-8">
+        <div className="lg:w-9/12 w-full">
           <Link className="flex items-center" href={`/profile/${user?._id}`}>
             <div>
               <img
@@ -239,7 +207,7 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1">
-                {" "}
+                {' '}
                 <p className="font-bold mr-1 text-medium">{user?.name}</p>
                 {user?.isVerified === true && (
                   <div>
@@ -261,7 +229,7 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
                   </div>
                 )}
               </div>
-              <p>9 months ago</p>
+              <p>{moment(singlePost?.data?.createdAt).fromNow()}</p>
             </div>
 
             {/* <p className="ml-2 font-extralight ">1d</p> */}
@@ -270,17 +238,16 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
             <section className="">
               {/* Images Section */}
               {singlePost?.data?.images?.length > 0 && (
-                <div className="grid grid-cols-1  gap-4 mt-6">
+                <div className="grid grid-cols-2 gap-2 lg:gap-4 mt-6">
                   {singlePost.data.images.map(
                     (image: string, index: number) => (
-                      <img
-                        key={index}
-                        src={image}
-                        // alt={`Post Image ${index + 1}`}
-                        // alt="image"
-                        alt=""
-                        className="h-[500px] w-full object-cover rounded-lg "
-                      />
+                      <div key={index} className="w-full h-[300px]">
+                        <img
+                          src={image}
+                          alt=""
+                          className="h-full w-full object-cover rounded-lg "
+                        />
+                      </div>
                     )
                   )}
                 </div>
@@ -297,46 +264,19 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
             <div className="flex items-center justify-between gap-4 mt-2">
               <div className="flex items-center gap-10 ">
                 <div className="flex items-center gap-2 ">
-                  {/* <AiOutlineLike
-                 className={` ${
-                   !!like || !!disLike
-                     ? like
-                       ? "text-[#4CAF50] !fill-[#4CAF50] cursor-not-allowed"
-                       : "cursor-not-allowed"
-                     : "cursor-pointer"
-                 }`}
-                 size={30}
-               /> */}
-                  {/* <svg
-                 className={`size-7 transition-colors duration-200 ease-in-out ${
-                   like
-                     ? "text-[#1877F2] cursor-not-allowed"
-                     : disLike
-                     ? "text-gray-400 cursor-not-allowed"
-                     : "text-gray-600 hover:text-[#1877F2] cursor-pointer"
-                 }`}
-                 fill="currentColor" // ✅ Important!
-                 stroke="currentColor"
-                 strokeWidth="1.5"
-                 viewBox="0 0 24 24"
-                 xmlns="http://www.w3.org/2000/svg"
-                 onClick={() => !like && !disLike && handleLike()}
-               >
-                 <path d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904" />
-               </svg> */}
                   <svg
-                    className={`size-7 ${
+                    className={`lg:size-7 size-6 ${
                       !!like || !!disLike
                         ? like
-                          ? "text-secondary fill-secondary cursor-not-allowed"
-                          : "cursor-not-allowed"
-                        : "cursor-pointer"
+                          ? 'text-secondary fill-secondary cursor-not-allowed'
+                          : 'cursor-not-allowed'
+                        : 'cursor-pointer'
                     } `}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    fill={`${like ? "currentColor" : "none"} `}
+                    fill={`${like ? 'currentColor' : 'none'} `}
                   >
                     <path
                       strokeLinecap="round"
@@ -348,18 +288,18 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <svg
-                    fill={`${disLike ? "currentColor" : "none"} `}
+                    fill={`${disLike ? 'currentColor' : 'none'} `}
                     strokeWidth="1.5"
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
-                    onClick={() => handleCreateReact("dislike")}
+                    onClick={() => handleCreateReact('dislike')}
                     stroke="currentColor"
-                    className={`size-7 ${
+                    className={`lg:size-7 size-6 ${
                       !!like || !!disLike
                         ? disLike
-                          ? "text-blue-500 fill-blue-500 cursor-not-allowed"
-                          : "cursor-not-allowed"
-                        : "cursor-pointer"
+                          ? 'text-blue-500 fill-blue-500 cursor-not-allowed'
+                          : 'cursor-not-allowed'
+                        : 'cursor-pointer'
                     } `}
                   >
                     <path
@@ -370,18 +310,13 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
                   </svg>
                   <p className="text-[#65686C]">{disLike}</p>
                 </div>
-                <IoShareSocialOutline
-                  className="cursor-pointer"
-                  onClick={onShareModalOpen}
-                  size={28}
-                />
               </div>
 
               <svg
-                className={`size-7 ${
-                  userSavedPosts?.data?.length > 0
-                    ? "text-red-600 fill-red-600"
-                    : "text-gray-500 fill-none"
+                className={`lg:size-7 size-6 ${
+                  userSavedPosts?.data?.data?.length > 0
+                    ? 'text-red-600 fill-red-600'
+                    : 'text-gray-500 fill-none'
                 } cursor-pointer transition-colors duration-200 ease-in-out`}
                 stroke="currentColor"
                 strokeWidth="1.5"
@@ -401,7 +336,7 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
             <div className="cursor-pointer my-1 font-extralight">
               {allPostComments?.length > 0 ? (
                 <button onClick={handleModalOpen}>
-                  View all {allPostComments?.length} comments{" "}
+                  View all {allPostComments?.length} comments{' '}
                 </button>
               ) : (
                 <p>No comments yet. Be the first to comment!</p>
@@ -423,7 +358,7 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
             </div>
           </div>
           <form onSubmit={handleCommentSubmit}>
-            <div className="relative mt-1">
+            <div className="relative mt-3">
               {createCommentPending ? (
                 <p>Posting ...</p>
               ) : (
@@ -433,8 +368,8 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
                     aria-label="comment-input"
                     placeholder="Add a comment..."
                     style={{
-                      paddingRight: "3rem",
-                      backgroundColor: "transparent",
+                      paddingRight: '3rem',
+                      backgroundColor: 'transparent',
                     }}
                     value={comment}
                     onChange={handleInputChange}
@@ -453,6 +388,16 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
           <RightSection />
         </div>
       </div>
+
+      {/* recent posts for small screen */}
+      <div className="lg:hidden block">
+        <p className="py-5 pt-10 font-bold text-xl">Recent Posts</p>
+        <div className="grid grid-cols-1">
+          {filterRecentPosts?.map((post: IPost) => (
+            <PostCard key={post?._id} item={post} />
+          ))}
+        </div>
+      </div>
       <Modal
         className="mt-16"
         isOpen={isModalOpen}
@@ -468,7 +413,7 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
                 <img
                   alt=""
                   className="h-[80vh] w-full"
-                  src={singlePost?.data?.images?.[0] || ""}
+                  src={singlePost?.data?.images?.[0] || ''}
                 />
               </div>
               <div className="">
@@ -491,6 +436,13 @@ const PostDetails = ({ params }: { params: { postId: string } }) => {
         setText={setText}
         text={text}
         clipBoard={`${process.env.NEXT_PUBLIC_CLIENT_API}/posts/${params.postId}`}
+      />
+      <WishlistModal
+        btn1="VIEW"
+        btn2="CLOSE"
+        handleRemoveCart={handleGoToWishlistPage}
+        isOpen={isWishlistModalOpen}
+        onOpenChange={onWishlistModalOpenChange}
       />
     </>
   );

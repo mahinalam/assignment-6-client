@@ -1,15 +1,13 @@
-"use client";
-
-import React from "react";
-import Link from "next/link";
+import React from 'react';
+import Button from './Button';
 
 const AboutPage = () => {
   return (
-    <main className="min-h-screen bg-white text-gray-800 px-4 md:px-20 py-12">
+    <main className="min-h-screen bg-white text-gray-800 px-4 md:px-20 py-12 mt-[106px] lg:mt-0">
       {/* Hero Section */}
       <section className="text-center max-w-3xl mx-auto mb-12">
         <h1 className="text-4xl md:text-5xl font-bold text-green-700 mb-4">
-          About GardenSocial
+          About GreenHaven
         </h1>
         <p className="text-lg md:text-xl text-gray-600">
           A community-driven social platform where garden lovers connect, share,
@@ -81,12 +79,7 @@ const AboutPage = () => {
         <p className="text-gray-700 text-lg mb-4">
           Ready to grow your garden and your community?
         </p>
-        <Link
-          href="/register"
-          className="inline-block px-6 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
-        >
-          Join GardenSocial
-        </Link>
+        <Button />
       </div>
     </main>
   );

@@ -1,36 +1,36 @@
-"use client";
-import { IPost } from "@/src/types";
-import { FiEdit3 } from "react-icons/fi";
-import { AiOutlineDelete } from "react-icons/ai";
-import React, { useState } from "react";
-import Link from "next/link";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { useDeleteBlog, useUpdateBlog } from "@/src/hooks/blog.hook";
+'use client';
+import { IBlog } from '@/src/types';
+import React from 'react';
+import Link from 'next/link';
+import moment from 'moment';
 
-const SingleBlogCard = ({ post }: { post: IPost }) => {
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const { _id, images, title, content, user } = post;
-  const { mutate } = useDeleteBlog();
-  const { mutate: updatePost } = useUpdateBlog();
-  const queryClient = useQueryClient();
+const SingleBlogCard = ({ post }: { post: IBlog }) => {
+  const { _id, images, title, content, author, status, createdAt } = post;
 
   return (
     <>
-      <div className="group border rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white max-w-xl mx-auto hover:scale-[1.01]">
+      <div className="group border rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white   hover:scale-[1.01]">
         {/* Header */}
         <div className="flex items-center justify-between p-4">
           {/* User Info */}
           <div className="flex items-center gap-3">
             <img
-              src={user?.profilePhoto || "/default-avatar.png"}
-              alt={user?.name || "User"}
+              src={author?.profilePhoto || '/default-avatar.png'}
+              alt={author?.name || 'User'}
               className="w-10 h-10 rounded-full object-cover border"
             />
             <div className="text-sm">
-              <p className="font-semibold text-gray-800">{user?.name}</p>
-              <p className="text-gray-500 text-xs">10 months ago</p>
-              <p className="text-green-600 text-xs font-medium">Published</p>
+              <p className="font-semibold text-gray-800">{author?.name}</p>
+              <p className="text-gray-500 text-xs">
+                {moment(createdAt).fromNow()}
+              </p>
+              <p
+                className={`text-xs font-medium ${
+                  status === 'approved' ? 'text-primary' : 'text-red-600'
+                } `}
+              >
+                {status}
+              </p>
             </div>
           </div>
         </div>

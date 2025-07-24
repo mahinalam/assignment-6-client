@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { Modal, ModalContent, ModalBody, Button } from "@nextui-org/react";
-import GTInput from "../form/GTInput";
-import GTForm from "../form/GTForm";
-import GTSelect from "../form/GTSelect";
-import GTQuill from "../form/GTQuill";
-import { useUser } from "@/src/context/user.provider";
-import { useIsUserVerified } from "@/src/hooks/payment.hook";
+import { Modal, ModalContent, ModalBody, Button } from '@nextui-org/react';
+import GTInput from '../form/GTInput';
+import GTForm from '../form/GTForm';
+import GTSelect from '../form/GTSelect';
+import GTQuill from '../form/GTQuill';
+import { useUser } from '@/src/context/user.provider';
+import { useGetSingleUser } from '@/src/hooks/auth.hook';
 
 interface IProps {
   isOpen: any;
@@ -36,14 +36,13 @@ export default function CreatePostModal({
   //   label: category.name,
   // }));
 
-  const { user } = useUser();
-  console.log({ user });
-
-  const { data } = useIsUserVerified();
-  console.log("res", data);
-
   // const categoriesOption =
 
+  const { user: currentUserInfo } = useUser();
+
+  const { data: currentUserData } = useGetSingleUser(
+    currentUserInfo?._id as string
+  );
   return (
     <>
       <Modal
@@ -65,35 +64,35 @@ export default function CreatePostModal({
                   <GTForm onSubmit={handleCreateProduct}>
                     {/* Title Field */}
 
-                    {data?.success && (
-                      <div>
-                        <label className="font-bold mb-3" htmlFor="title">
-                          Title
-                        </label>
-                        <div className="py-3">
-                          <GTInput
-                            id="title"
-                            label="Title"
-                            name="title"
-                            type="text"
-                          />
-                        </div>
+                    <div>
+                      <label className="font-bold mb-3" htmlFor="title">
+                        Title
+                      </label>
+                      <div className="py-3">
+                        <GTInput
+                          id="title"
+                          label="Title"
+                          name="title"
+                          type="text"
+                        />
                       </div>
-                    )}
-                    {postTypeOption?.length > 0 && (
-                      <div>
-                        <label className="font-bold mb-3" htmlFor="category">
-                          Type
-                        </label>
-                        <div className="py-3">
-                          <GTSelect
-                            label="Type"
-                            name="type"
-                            options={postTypeOption}
-                          />
+                    </div>
+
+                    {currentUserData?.data?.isVerified &&
+                      postTypeOption?.length > 0 && (
+                        <div>
+                          <label className="font-bold mb-3" htmlFor="category">
+                            Type
+                          </label>
+                          <div className="py-3">
+                            <GTSelect
+                              label="Type"
+                              name="type"
+                              options={postTypeOption}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {/* <GTInput name="title" label="Title" required /> */}
 
@@ -121,7 +120,9 @@ export default function CreatePostModal({
                       <p className=" mt-10 font-bold mb-3">Upload Image</p>
                       <label
                         aria-label="Upload Your Files"
-                        className={`flex cursor-pointer hover:bg-athens-gray-50/10 items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all`}
+                        className={
+                          'flex cursor-pointer hover:bg-athens-gray-50/10 items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all'
+                        }
                         htmlFor="image"
                       >
                         <div className="flex size-16 items-center justify-center rounded-full bg-athens-gray-50">
@@ -166,8 +167,11 @@ export default function CreatePostModal({
                           }
                         }}
                       />
-                      {imageFiles.map((imageFile: any) => (
-                        <div className="relative flex items-center gap-2 rounded-md border border-athens-gray-200 bg-white p-3">
+                      {imageFiles.map((imageFile: any, index: number) => (
+                        <div
+                          key={index}
+                          className="relative flex items-center gap-2 rounded-md border border-athens-gray-200 bg-white p-3"
+                        >
                           <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-athens-gray-100">
                             <svg
                               className="lucide lucide-image size-4 text-athens-gray-800"

@@ -1,13 +1,26 @@
-"use client";
-import Container from "@/src/components/Container";
-import PostCard from "@/src/components/dashboard/PostCard";
-import { useUser } from "@/src/context/user.provider";
-import { useGetUserPost } from "@/src/hooks/post.hook";
-import { IPost } from "@/src/types";
-import React from "react";
+'use client';
+
+import { useUser } from '@/src/context/user.provider';
+import UserDashboardHomePageComponent from '@/src/components/dashboard/UserDashboardHomePage';
+import AdminDashboardHomePageComponent from '@/src/components/dashboard/AdminDashboardHomePage';
 
 const DashboardPage = () => {
-  return <h1>This is dashboard home</h1>;
+  const { user } = useUser();
+
+  if (!user) return null;
+
+  return (
+    <>
+      {user.role === 'USER' ? (
+        <UserDashboardHomePageComponent />
+      ) : (
+        <AdminDashboardHomePageComponent />
+      )}
+    </>
+  );
 };
 
 export default DashboardPage;
+
+// TODO: implement group
+// TODO: Implement share post , follow , unfollow on user card

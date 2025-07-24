@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client";
+'use client';
 
-import { useQueryClient } from "@tanstack/react-query";
-import { ChangeEvent, useState } from "react";
-import { SubmitHandler } from "react-hook-form";
-import { Button } from "@nextui-org/button";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from '@tanstack/react-query';
+import { ChangeEvent, useState } from 'react';
+import { SubmitHandler } from 'react-hook-form';
+import { Button } from '@nextui-org/button';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import GTForm from "@/src/components/form/GTForm";
-import GTInput from "@/src/components/form/GTInput";
-import GTQuill from "@/src/components/form/GTQuill";
-import GTSelect from "@/src/components/form/GTSelect";
-import { useUser } from "@/src/context/user.provider";
-import { useCreatePost } from "@/src/hooks/post.hook";
-import { useGetAllCategories } from "@/src/hooks/category.hook";
-import { createPostSchema } from "@/src/schemas/post.schema";
+import GTForm from '@/src/components/form/GTForm';
+import GTInput from '@/src/components/form/GTInput';
+import GTQuill from '@/src/components/form/GTQuill';
+import GTSelect from '@/src/components/form/GTSelect';
+import { useUser } from '@/src/context/user.provider';
+import { useCreatePost } from '@/src/hooks/post.hook';
+import { useGetAllCategories } from '@/src/hooks/category.hook';
+import { createPostSchema } from '@/src/schemas/post.schema';
+import { toast } from 'sonner';
+import { useGetSingleUser } from '@/src/hooks/auth.hook';
 
 interface FormValues {
   title: string;
@@ -39,32 +41,42 @@ export default function CreatePost() {
 
   const { user } = useUser();
 
+  const { data: currentUserData } = useGetSingleUser(user?._id as string);
+
   if (categoriesLoading) {
     return <p>Loading ...</p>;
   }
 
-  const categories = categoriesData?.data.map((category: any) => ({
+  const categories = categoriesData?.data.data?.map((category: any) => ({
     key: category?._id,
     label: category.name,
   }));
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  const onSubmit: SubmitHandler<any> = (data) => {
+    const id = toast.loading('Creating post...');
     const formData = new FormData();
     const postData = {
       user: user?._id,
       title: data.title,
       content: data.content,
       category: data.category,
+      isPremium: data?.type !== 'general',
     };
 
-    console.log({ postData });
-
-    formData.append("data", JSON.stringify(postData));
-    for (let image of imageFiles) {
-      formData.append("itemImages", image);
+    formData.append('data', JSON.stringify(postData));
+    for (const image of imageFiles) {
+      formData.append('itemImages', image);
     }
 
-    // handleCreatePost(formData);
+    handleCreatePost(formData, {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: ['POST'] });
+        toast.success('Post created successfully', { id });
+      },
+      onError: () => {
+        toast.error('Something went wrong!', { id });
+      },
+    });
   };
 
   const handleDeleteImage = (deletedImage: any) => {
@@ -73,10 +85,18 @@ export default function CreatePost() {
     );
     setImageFiles(updatedImage);
   };
+
+  const postTypeOption = [
+    { key: 'general', label: 'General' },
+    { key: 'premium', label: 'premium' },
+  ];
+
   return (
-    <div className="w-full lg:w-[60%] mx-auto">
+    <div className="w-full lg:w-[60%] mx-auto mt-[64px] lg:mt-0">
       <div>
-        <h1 className="font-semibold lg:text-2xl my-5 lg:my-10">Create Post</h1>
+        <h1 className="font-semibold lg:text-2xl text-xl my-5 lg:my-10">
+          Create Post
+        </h1>
       </div>
       <GTForm onSubmit={onSubmit}>
         {/* Title Field */}
@@ -89,7 +109,17 @@ export default function CreatePost() {
             <GTInput id="title" label="Title" name="title" type="text" />
           </div>
         </div>
-        {/* <GTInput name="title" label="Title" required /> */}
+
+        {currentUserData?.data?.isVerified && postTypeOption?.length > 0 && (
+          <div>
+            <label className="font-bold mb-3" htmlFor="category">
+              Type
+            </label>
+            <div className="py-3">
+              <GTSelect label="Type" name="type" options={postTypeOption} />
+            </div>
+          </div>
+        )}
 
         {/* Content Field */}
         <div>
@@ -107,42 +137,14 @@ export default function CreatePost() {
             placeholder="Write your content here..."
           />
         </div>
-        {/* <div className="min-w-fit flex-1 mt-12">
-          <label
-            className="flex h-14 w-full cursor-pointer items-center justify-center rounded-xl border-2 border-default-200  shadow-sm transition-all duration-100 hover:border-default-400"
-            htmlFor="image"
-          >
-            <span className="font-medium"> Upload image</span>
-          </label>
-          <input
-            multiple
-            className="hidden"
-            id="image"
-            type="file"
-            onChange={(e) => handleImageChange(e)}
-          />
-        </div> */}
-        {/* {imagePreviews.length > 0 && (
-          <div className="flex gap-5 my-5 flex-wrap">
-            {imagePreviews.map((imageDataUrl) => (
-              <div
-                key={imageDataUrl}
-                className="relative size-48 rounded-xl border-2 border-dashed border-default-300 p-2"
-              >
-                <img
-                  alt="item"
-                  className="h-full w-full object-cover object-center rounded-md"
-                  src={imageDataUrl}
-                />
-              </div>
-            ))}
-          </div>
-        )} */}
+
         <div className="lg:pt-0 pt-5">
           <p className=" mt-12 font-bold mb-3">Upload Image</p>
           <label
             aria-label="Upload Your Files"
-            className={`flex cursor-pointer hover:bg-athens-gray-50/10 items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all`}
+            className={
+              'flex cursor-pointer hover:bg-athens-gray-50/10 items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all'
+            }
             htmlFor="image"
           >
             <div className="flex size-16 items-center justify-center rounded-full bg-athens-gray-50">
@@ -184,8 +186,11 @@ export default function CreatePost() {
               }
             }}
           />
-          {imageFiles.map((imageFile) => (
-            <div className="relative flex items-center gap-2 rounded-md border border-athens-gray-200 bg-white p-3">
+          {imageFiles.map((imageFile, index: number) => (
+            <div
+              key={index}
+              className="relative flex items-center gap-2 rounded-md border border-athens-gray-200 bg-white p-3"
+            >
               <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-athens-gray-100">
                 <svg
                   className="lucide lucide-image size-4 text-athens-gray-800"
@@ -237,9 +242,8 @@ export default function CreatePost() {
         </div>
         <Button
           fullWidth
-          className=" border-[1px] bg-transparent hover:border-white hover:text-white hover:bg-green-600 
+          className=" border-[1px] bg-transparent  text-white hover:bg-green-700 
          border-white bg-green-600 mt-5"
-          isLoading={createPostPending}
           size="lg"
           spinner={
             <svg

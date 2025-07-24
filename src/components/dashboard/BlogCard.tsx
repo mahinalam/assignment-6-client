@@ -1,25 +1,23 @@
-"use client";
-import { IPost } from "@/src/types";
-import { FiEdit3 } from "react-icons/fi";
-import { AiOutlineDelete } from "react-icons/ai";
-import React, { useState } from "react";
-import Link from "next/link";
-import DeleteModal from "../modal/DeleteModal";
-import { useDisclosure } from "@nextui-org/modal";
-import { useUpdatePost } from "@/src/hooks/post.hook";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import EditProductModal from "../modal/EditPostModal";
-import { useDeleteBlog, useUpdateBlog } from "@/src/hooks/blog.hook";
+'use client';
+import { IBlog, IPost } from '@/src/types';
+import { FiEdit3 } from 'react-icons/fi';
+import { AiOutlineDelete } from 'react-icons/ai';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import DeleteModal from '../modal/DeleteModal';
+import { useDisclosure } from '@nextui-org/modal';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import EditProductModal from '../modal/EditPostModal';
+import { useDeleteBlog, useUpdateBlog } from '@/src/hooks/blog.hook';
+import moment from 'moment';
 
-const BlogCard = ({ post }: { post: IPost }) => {
+const BlogCard = ({ post }: { post: IBlog }) => {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const { _id, images, title, content, user } = post;
+  const { _id, images, title, content, author, status, createdAt } = post;
   const { mutate } = useDeleteBlog();
   const { mutate: updatePost } = useUpdateBlog();
   const queryClient = useQueryClient();
-
-  console.log("edit blogs", post);
   const {
     isOpen: isDeleteModalOpen,
     onOpen: onDeleteModalOpen,
@@ -48,15 +46,15 @@ const BlogCard = ({ post }: { post: IPost }) => {
 
   // delete post
   const handleDeletePost = () => {
-    const id = toast.loading("Deleting blog...");
+    const id = toast.loading('Deleting blog...');
     if (_id) {
       mutate(_id, {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["BLOG"] });
-          toast.success("Blog deleted successfully", { id });
+          queryClient.invalidateQueries({ queryKey: ['BLOG'] });
+          toast.success('Blog deleted successfully', { id });
         },
         onError: (error) => {
-          toast.error(error?.message || "Failed to delete blog!", { id });
+          toast.error(error?.message || 'Failed to delete blog!', { id });
         },
       });
     }
@@ -64,29 +62,27 @@ const BlogCard = ({ post }: { post: IPost }) => {
 
   // update blog
   const handleUpdateBlog = (data: Partial<IPost>) => {
-    const id = toast.loading("Updating blog...");
+    const id = toast.loading('Updating blog...');
     const formData = new FormData();
     const postData = {
       blogId: _id,
       ...data,
     };
-    console.log({ postData });
-    formData.append("data", JSON.stringify(postData));
+    formData.append('data', JSON.stringify(postData));
     if (imageFiles.length > 0) {
-      for (let image of imageFiles) {
-        formData.append("itemImages", image);
+      for (const image of imageFiles) {
+        formData.append('itemImages', image);
       }
     }
 
     updatePost(formData, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["BLOG"] });
-        toast.success("Blog updated successfully", { id });
+        queryClient.invalidateQueries({ queryKey: ['BLOG'] });
+        toast.success('Blog updated successfully', { id });
         onEditModalOPenChange();
       },
       onError: (error) => {
-        console.log({ error });
-        toast.error(error?.message || "Failed to update blog!", { id });
+        toast.error(error?.message || 'Failed to update blog!', { id });
       },
     });
   };
@@ -99,14 +95,22 @@ const BlogCard = ({ post }: { post: IPost }) => {
           {/* User Info */}
           <div className="flex items-center gap-3">
             <img
-              src={user?.profilePhoto || "/default-avatar.png"}
-              alt={user?.name || "User"}
+              src={author?.profilePhoto || '/default-avatar.png'}
+              alt={author?.name || 'author'}
               className="w-10 h-10 rounded-full object-cover border"
             />
             <div className="text-sm">
-              <p className="font-semibold text-gray-800">{user?.name}</p>
-              <p className="text-gray-500 text-xs">10 months ago</p>
-              <p className="text-green-600 text-xs font-medium">Published</p>
+              <p className="font-semibold text-gray-800">{author?.name}</p>
+              <p className="text-gray-500 text-xs">
+                {moment(createdAt).fromNow()}
+              </p>
+              <p
+                className={`text-xs font-medium ${
+                  status === 'approved' ? 'text-primary' : 'text-red-600'
+                } `}
+              >
+                {status}
+              </p>
             </div>
           </div>
 
@@ -153,26 +157,29 @@ const BlogCard = ({ post }: { post: IPost }) => {
           </div>
         </Link>
       </div>
-      <DeleteModal
-        handleDeleteProduct={handleDeletePost}
-        isOpen={isDeleteModalOpen}
-        subTitle="Are you sure want to delete this blog?"
-        title={`Delete ${title}`}
-        onOpenChange={onDeleteModalChange}
-      />
-
-      <EditProductModal
-        isOpen={isEditModalOPen}
-        onOpenChange={onEditModalOPenChange}
-        handleUpdateProduct={handleUpdateBlog}
-        editProductImages={images}
-        defaultValue={post}
-        handleDeleteNewProductImages={handleDeleteImage}
-        imageFiles={imageFiles}
-        setImageFiles={setImageFiles}
-        modalBtn="Update Blog"
-        modalTitle="Update Blog"
-      />
+      {isDeleteModalOpen && (
+        <DeleteModal
+          handleDeleteProduct={handleDeletePost}
+          isOpen={isDeleteModalOpen}
+          subTitle="Are you sure want to delete this blog?"
+          title={`Delete ${title}`}
+          onOpenChange={onDeleteModalChange}
+        />
+      )}
+      {isEditModalOPen && (
+        <EditProductModal
+          isOpen={isEditModalOPen}
+          onOpenChange={onEditModalOPenChange}
+          handleUpdateProduct={handleUpdateBlog}
+          editProductImages={images}
+          defaultValue={post}
+          handleDeleteNewProductImages={handleDeleteImage}
+          imageFiles={imageFiles}
+          setImageFiles={setImageFiles}
+          modalBtn="Update Blog"
+          modalTitle="Update Blog"
+        />
+      )}
     </>
   );
 };

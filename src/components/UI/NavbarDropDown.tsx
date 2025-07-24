@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
 import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-} from "@nextui-org/dropdown";
-import { usePathname, useRouter } from "next/navigation";
-import { Avatar } from "@nextui-org/avatar";
+} from '@nextui-org/dropdown';
+import { usePathname, useRouter } from 'next/navigation';
+import { Avatar } from '@nextui-org/avatar';
 
-import { logout } from "@/src/services/AuthService";
-import { useUser } from "@/src/context/user.provider";
+import { logout } from '@/src/services/AuthService';
+import { useUser } from '@/src/context/user.provider';
 // import { protectedRoutes } from "@/src/constant";
 
 export default function NavbarDropdown() {

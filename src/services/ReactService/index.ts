@@ -1,19 +1,17 @@
-"use server";
+'use server';
 
-import axiosInstance from "@/src/lib/AxiosInstance";
+import axiosInstance from '@/src/lib/AxiosInstance';
 
 export const createReact = async (payload: {
   post: string;
   type: string;
 }): Promise<any> => {
   try {
-    const { data } = await axiosInstance.post("/react", payload, {
+    const { data } = await axiosInstance.post('/react', payload, {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
-
-    console.log("paload from service", payload);
     return data;
   } catch (error: any) {
     throw new Error(error.message);

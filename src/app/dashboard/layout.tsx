@@ -1,5 +1,5 @@
-import Sidebar from "@/src/components/dashboard/Sidebar";
-import { getCurrentUser } from "@/src/services/AuthService";
+import Sidebar from '@/src/components/dashboard/Sidebar';
+import { getCurrentUser } from '@/src/services/AuthService';
 import {
   FileTextIcon,
   HomeIcon,
@@ -7,53 +7,107 @@ import {
   SettingsIcon,
   UserIcon,
   SaveIcon,
-} from "lucide-react";
-import React from "react";
+} from 'lucide-react';
+import React from 'react';
+import { BiCategoryAlt } from 'react-icons/bi';
+import { AiOutlineDollar } from 'react-icons/ai';
+import { CgProfile } from 'react-icons/cg';
+import { TbUsers } from 'react-icons/tb';
 
 export default async function userDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { _id } = await getCurrentUser();
+  const { _id, role }: any = await getCurrentUser();
   // const {} =
   const userMenuItems = [
     {
-      key: "dashboard",
-      label: "Dashboard",
-      icon: <HomeIcon />,
-      href: "/dashboard",
+      key: 'dashboard',
+      label: 'Dashboard',
+      icon: <HomeIcon size={25} />,
+      href: '/dashboard',
     },
     {
-      key: "profile",
-      label: "Profile",
-      icon: <UserIcon />,
+      key: 'profile',
+      label: 'Profile',
+      icon: <CgProfile size={25} />,
       href: `/profile/${_id}`,
     },
     {
-      key: "contents",
-      label: "Contents",
-      icon: <FileTextIcon />,
+      key: 'contents',
+      label: 'Contents',
+      icon: <FileTextIcon size={25} />,
       children: [
         {
-          key: "all-posts",
-          label: "All Posts",
-          href: "/dashboard/user/posts",
+          key: 'all-posts',
+          label: 'All Posts',
+          href: '/dashboard/user/posts',
         },
         {
-          key: "all-blogs",
-          label: "All Blogs",
-          href: "/dashboard/user/blogs",
+          key: 'all-blogs',
+          label: 'All Blogs',
+          href: '/dashboard/user/blogs',
         },
       ],
     },
     {
-      key: "saved-posts",
-      label: "Saved Posts",
-      icon: <SaveIcon />,
-      href: "/dashboard/user/wishlist",
+      key: 'saved-posts',
+      label: 'Saved Posts',
+      icon: <SaveIcon size={25} />,
+      href: '/dashboard/user/wishlist',
     },
   ];
+  const adminMenuItems = [
+    {
+      key: 'dashboard',
+      label: 'Dashboard',
+      icon: <HomeIcon size={25} />,
+      href: '/dashboard',
+    },
+    {
+      key: 'profile',
+      label: 'Profile',
+      icon: <CgProfile size={25} />,
+      href: role === 'USER' ? `/profile/${_id}` : '/profile/edit-profile',
+    },
+    {
+      key: 'users',
+      label: 'Users',
+      icon: <TbUsers size={25} />,
+      href: '/dashboard/admin/manage-users',
+    },
+    {
+      key: 'contents',
+      label: 'Contents',
+      icon: <FileTextIcon size={25} />,
+      children: [
+        {
+          key: 'all-posts',
+          label: 'All Posts',
+          href: '/dashboard/admin/manage-posts',
+        },
+        {
+          key: 'all-blogs',
+          label: 'All Blogs',
+          href: '/dashboard/admin/manage-blogs',
+        },
+      ],
+    },
+    {
+      key: 'categories',
+      label: 'Categories',
+      icon: <BiCategoryAlt size={25} />,
+      href: '/dashboard/admin/manage-categories',
+    },
+    {
+      key: 'payments',
+      label: 'Payments',
+      icon: <AiOutlineDollar size={25} />,
+      href: '/dashboard/admin/manage-payments',
+    },
+  ];
+
   return (
     // <div className="flex flex-col md:flex-row min-h-screen md:gap-10">
     //   <div className="mb-10 md:mb-0 ">
@@ -64,7 +118,11 @@ export default async function userDashboardLayout({
     //   </main>
     // </div>
     <div className="flex flex-col md:flex-row min-h-screen">
-      <Sidebar menuItems={userMenuItems} />
+      {role === 'USER' ? (
+        <Sidebar menuItems={userMenuItems} />
+      ) : (
+        <Sidebar menuItems={adminMenuItems} />
+      )}
 
       <main className="flex-grow p-4 md:p-8 md:ml-72 lg:ml-80 transition-all duration-300">
         {children}

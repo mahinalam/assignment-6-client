@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   Table,
   TableHeader,
@@ -13,18 +13,14 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-} from "@nextui-org/react";
-import React, { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+} from '@nextui-org/react';
+import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
-import {
-  useDeletePost,
-  useGetAllPosts,
-  useGetUserPost,
-} from "@/src/hooks/post.hook";
-import { useUser } from "@/src/context/user.provider";
-import { toast } from "sonner";
-import { useGetSingleUser } from "@/src/hooks/auth.hook";
+import { useDeletePost } from '@/src/hooks/post.hook';
+import { useUser } from '@/src/context/user.provider';
+import { toast } from 'sonner';
+import { useGetSingleUser } from '@/src/hooks/auth.hook';
 
 const MyFollowers = () => {
   const queryClient = useQueryClient();
@@ -39,7 +35,6 @@ const MyFollowers = () => {
 
   const { mutate: deletePost, isPending } = useDeletePost();
   const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
-  console.log("myData ", myData);
   // useEffect(() => {
   //     getAllGardeningPosts();
   //     // eslint-disable-next-line
@@ -50,20 +45,18 @@ const MyFollowers = () => {
     return <div>Loading...</div>;
   }
 
-  console.log("deleteModalId", deleteModalId);
-
   const handleDeletePost = () => {
     if (deleteModalId) {
       deletePost(deleteModalId, {
         onSuccess: (res) => {
           if (res.success) {
-            queryClient.invalidateQueries({ queryKey: ["POST"] });
-            toast.success("Post deleted successfully");
+            queryClient.invalidateQueries({ queryKey: ['POST'] });
+            toast.success('Post deleted successfully');
             onClose();
           }
         },
         onError: (error) => {
-          toast.error("Failed to delete post");
+          toast.error('Failed to delete post');
           onClose();
         },
       });

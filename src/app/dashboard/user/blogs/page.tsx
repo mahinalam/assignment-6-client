@@ -1,21 +1,27 @@
-"use client";
-import Container from "@/src/components/Container";
-import BlogCard from "@/src/components/dashboard/BlogCard";
-import PostCard from "@/src/components/dashboard/PostCard";
-import CreatePostModal from "@/src/components/modal/CreatePostModal";
-import { useUser } from "@/src/context/user.provider";
-import { useCreateBlog, useGetUserBlogs } from "@/src/hooks/blog.hook";
-import { useGetAllCategories } from "@/src/hooks/category.hook";
-import { useGetUserPost } from "@/src/hooks/post.hook";
-import { IPost } from "@/src/types";
-import { useDisclosure } from "@nextui-org/modal";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
-import React, { useState } from "react";
-import { toast } from "sonner";
+'use client';
+import BlogCard from '@/src/components/dashboard/BlogCard';
+import DashboardContainer from '@/src/components/DashboardContainer';
+import DashboardPostsPageSkeleton from '@/src/components/loading-skeleton/DashboardPostsPageSkeleton';
+import CreatePostModal from '@/src/components/modal/CreatePostModal';
+import PaginationHelper from '@/src/components/sharred/paginationHelper';
+import { useUser } from '@/src/context/user.provider';
+import { useCreateBlog, useGetAllBlogs } from '@/src/hooks/blog.hook';
+import { useGetAllCategories } from '@/src/hooks/category.hook';
+import { IPost } from '@/src/types';
+import { useDisclosure } from '@nextui-org/modal';
+import { useQueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
 
 const Blogs = () => {
   const { user } = useUser();
-  const { data, isLoading } = useGetUserBlogs();
+  const [page, setPage] = useState(1);
+  const limit = 5;
+  const { data, isLoading } = useGetAllBlogs({
+    author: user?._id,
+    page,
+    limit,
+  });
   const { data: categoriesData, isLoading: categoriesLoading } =
     useGetAllCategories();
   const [createPostImageFiles, setCreatePostImageFiles] = useState<File[]>([]);
@@ -30,16 +36,18 @@ const Blogs = () => {
   const queryClient = useQueryClient();
 
   if (isLoading || categoriesLoading) {
-    return <p>Loading</p>;
+    return <DashboardPostsPageSkeleton />;
   }
 
-  const categories = categoriesData?.data.map((category: any) => ({
+  const totalProducts = data?.data?.meta?.total || 0;
+  const totalPages = Math.ceil(totalProducts / limit);
+
+  const categories = categoriesData?.data.data?.map((category: any) => ({
     key: category?._id,
     label: category.name,
   }));
 
   const hanldeDeleteCreatePostImage = (deletedImage: any) => {
-    console.log({ deletedImage });
     const updatedImage = createPostImageFiles.filter(
       (image) => image.name !== deletedImage
     );
@@ -52,7 +60,7 @@ const Blogs = () => {
 
   // create post
   const handleCreatePost = (data: Record<string, unknown>) => {
-    const id = toast.loading("Creating blog...");
+    const id = toast.loading('Creating blog...');
     const formData = new FormData();
     const postData = {
       author: user!._id,
@@ -60,30 +68,28 @@ const Blogs = () => {
       content: data.content,
       category: data.category,
     };
-    console.log({ postData });
-    formData.append("data", JSON.stringify(postData));
+    formData.append('data', JSON.stringify(postData));
 
     if (createPostImageFiles.length > 0) {
-      for (let image of createPostImageFiles) {
-        formData.append("itemImages", image);
+      for (const image of createPostImageFiles) {
+        formData.append('itemImages', image);
       }
     }
     createBlog(formData, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["BLOG"] });
-        toast.success("Blog created successfully", { id });
+        queryClient.invalidateQueries({ queryKey: ['BLOG'] });
+        toast.success('Blog created successfully', { id });
         onCreatePostModalOpenChange();
       },
       onError: (error) => {
-        console.log({ error });
-        toast.error(error?.message || "Failed to create blog!", { id });
+        toast.error(error?.message || 'Failed to create blog!', { id });
       },
     });
   };
   return (
-    <div>
+    <DashboardContainer>
       <div className="lg:mb-6 w-full flex justify-between items-center">
-        <p className="lg:text-2xl font-bold ">All Blogs</p>
+        <p className="text-2xl font-bold pt-6 pb-5 lg:pt-8 mt-4">All Blogs</p>
         <div className=" ">
           <button
             className="bg-primary text-sm text-white font-bold px-3 py-2 rounded-md "
@@ -94,10 +100,11 @@ const Blogs = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3  mx-auto gap-4">
-        {data?.data?.map((post: IPost) => (
-          <BlogCard post={post} />
+        {data?.data?.data?.map((post: IPost, index: number) => (
+          <BlogCard key={index} post={post as any} />
         ))}
       </div>
+      <PaginationHelper page={page} setPage={setPage} totalPages={totalPages} />
       <CreatePostModal
         isOpen={isCreatePostModalOPen}
         onOpenChange={onCreatePostModalOpenChange}
@@ -108,7 +115,7 @@ const Blogs = () => {
         categories={categories}
         submitName="Create Blog"
       />
-    </div>
+    </DashboardContainer>
   );
 };
 

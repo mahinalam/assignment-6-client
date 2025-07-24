@@ -155,14 +155,14 @@
 
 // // // export default ReactQuillWithSpacing;
 
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
-import { useFormContext } from "react-hook-form";
-import { useState, useEffect } from "react";
-import "react-quill/dist/quill.snow.css";
+import dynamic from 'next/dynamic';
+import { useFormContext } from 'react-hook-form';
+import { useState, useEffect } from 'react';
+import 'react-quill/dist/quill.snow.css';
 
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface IProps {
   name: string;
@@ -175,14 +175,14 @@ export default function GTQuill({
   name,
   label,
   placeholder,
-  defaultValue = "",
+  defaultValue = '',
 }: IProps) {
   const {
     setValue,
     formState: { errors },
   } = useFormContext();
 
-  const [quillValue, setQuillValue] = useState("");
+  const [quillValue, setQuillValue] = useState('');
 
   // Set defaultValue once on mount
   useEffect(() => {
@@ -204,7 +204,7 @@ export default function GTQuill({
         value={quillValue}
         onChange={handleQuillChange}
         placeholder={placeholder}
-        style={{ height: "250px" }}
+        style={{ height: '250px' }}
       />
       {errors[name] && (
         <p className="text-sm text-red-500 mt-1">

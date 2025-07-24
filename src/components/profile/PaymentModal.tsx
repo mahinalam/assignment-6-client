@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Modal,
   ModalContent,
@@ -7,7 +7,7 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-} from "@nextui-org/react";
+} from '@nextui-org/react';
 
 export default function CommentModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import moment from "moment";
-import { IoIosMore } from "react-icons/io";
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import moment from 'moment';
+import { IoIosMore } from 'react-icons/io';
 import {
   Modal,
   ModalContent,
@@ -12,9 +12,9 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-} from "@nextui-org/react";
-import { useDeleteComment } from "../hooks/comment.hook";
-import { useQueryClient } from "@tanstack/react-query";
+} from '@nextui-org/react';
+import { useDeleteComment } from '../hooks/comment.hook';
+import { useQueryClient } from '@tanstack/react-query';
 
 const CommentCard = ({ comment }: any) => {
   const { content, user, createdAt, _id } = comment;
@@ -28,7 +28,7 @@ const CommentCard = ({ comment }: any) => {
   const handleDeleteComment = () => {
     deleteCommentMutate(_id, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["COMMENTS"] });
+        queryClient.invalidateQueries({ queryKey: ['COMMENTS'] });
       },
     });
   };
@@ -53,7 +53,7 @@ const CommentCard = ({ comment }: any) => {
                   <p className="font-light">{content}</p>
                 </div>
                 <p className="text-xs text-gray-400">
-                  {createdAt ? moment(createdAt).format("MMMM D YYYY") : ""}
+                  {moment(createdAt).fromNow()}
                 </p>
               </div>
             </div>

@@ -50,9 +50,9 @@
 
 // export default SkeletonLoading;
 
-"use client";
+'use client';
 
-import { Skeleton } from "@nextui-org/react";
+import { Skeleton } from '@nextui-org/react';
 
 const SkeletonLoading = () => {
   return (

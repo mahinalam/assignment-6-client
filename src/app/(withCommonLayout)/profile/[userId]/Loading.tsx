@@ -1,5 +1,5 @@
 // components/profile/ProfileSkeleton.tsx
-import React from "react";
+import React from 'react';
 
 const ProfileSkeleton = () => {
   return (

@@ -1,7 +1,7 @@
-"use client";
-import React, { useState, useEffect, useContext } from "react";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
+'use client';
+import React, { useState, useEffect, useContext } from 'react';
+import { Avatar } from '@nextui-org/avatar';
+import { Button } from '@nextui-org/button';
 import {
   HomeIcon,
   LogOutIcon,
@@ -9,19 +9,27 @@ import {
   XIcon,
   ChevronDownIcon,
   UserIcon,
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { Divider } from "@nextui-org/react";
-import { useUser } from "@/src/context/user.provider";
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { Divider } from '@nextui-org/react';
+import { useUser } from '@/src/context/user.provider';
+import { logout } from '@/src/services/AuthService';
+import { useGetSingleUser } from '@/src/hooks/auth.hook';
 
 export default function Sidebar({ menuItems }: { menuItems: any }) {
-  const { user, setIsLoading } = useUser();
+  const { user, setIsLoading, setUser } = useUser();
+  const { data: currentUserInfo, isLoading } = useGetSingleUser(
+    user?._id as string
+  );
 
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [openItem, setOpenItem] = useState(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isNavOpen, setNavOpen] = useState('');
   // const { data: session } = useSession();
 
   useEffect(() => {
@@ -29,31 +37,28 @@ export default function Sidebar({ menuItems }: { menuItems: any }) {
       setIsMobile(window.innerWidth < 768);
     };
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const protectedRoutes = [
-    "/dashboard/:path*",
-    "/admin-dashboard/:path*",
-    "/login",
-    "/registration",
-  ];
-  const router = useRouter();
-  const pathname = usePathname();
+  // const protectedRoutes = [
+  //   "/dashboard/:path*",
+  //   "/admin-dashboard/:path*",
+  //   "/login",
+  //   "/registration",
+  // ];
 
+  // if (isLoading) {
+  //   return <p>Loading</p>;
+  // }
   const logoutHandler = () => {
     setIsLoading(true);
-    router.push("/");
-    // logoutUser();
-    // toast.success(`${user?.username} logged out successfully!`);
-    if (protectedRoutes.some((r) => pathname.match(r))) {
-      router.push("/");
-    }
+    logout();
+    toast.success(`${user?.name} logged out successfully!`);
+    router.push('/login');
   };
 
   const toggleSidebar = () => setIsOpen(!isOpen);
-
   return (
     <>
       {isMobile && (
@@ -70,13 +75,13 @@ export default function Sidebar({ menuItems }: { menuItems: any }) {
       )}
       <div
         className={`h-screen bg-gray-100 dark:bg-gray-800 w-72 lg:w-80 fixed left-0 top-0 transition-all duration-300 ease-in-out z-30 ${
-          isOpen || !isMobile ? "translate-x-0" : "-translate-x-full"
+          isOpen || !isMobile ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full p-4">
           <div className="flex flex-col items-center py-4">
-            {/* <Avatar src={user?.profilePicture} size="lg" /> */}
-            {/* <span className="font-bold mt-2">{user?.username}</span> */}
+            <Avatar src={currentUserInfo?.data?.profilePhoto} size="lg" />
+            <span className="font-bold mt-2">{user?.name}</span>
             <span className="text-sm text-gray-500 uppercase">
               {user?.role}
             </span>
@@ -98,7 +103,7 @@ export default function Sidebar({ menuItems }: { menuItems: any }) {
                       </div>
                       <ChevronDownIcon
                         className={`transition-transform ${
-                          openItem === item.key ? "rotate-180" : ""
+                          openItem === item.key ? 'rotate-180' : ''
                         }`}
                       />
                     </button>
@@ -121,8 +126,13 @@ export default function Sidebar({ menuItems }: { menuItems: any }) {
                 ) : (
                   <Link
                     href={item.href}
-                    className="flex items-center gap-2 py-3 px-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors duration-200"
-                    onClick={() => isMobile && toggleSidebar()}
+                    className={`flex items-center gap-2 py-3 px-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors duration-200 ${
+                      isNavOpen === item.key ? 'bg-gray-200' : ''
+                    }`}
+                    onClick={() => {
+                      isMobile && toggleSidebar();
+                      setNavOpen(item.key);
+                    }}
                   >
                     {item.icon}
                     <span>{item.label}</span>

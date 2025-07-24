@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Modal,
@@ -8,11 +8,9 @@ import {
   ModalFooter,
   Button,
   Avatar,
-  Input,
-} from "@nextui-org/react";
-import { useState } from "react";
-import { FiCopy, FiUsers, FiUser } from "react-icons/fi";
-import { toast } from "sonner";
+} from '@nextui-org/react';
+import { FiCopy } from 'react-icons/fi';
+import { toast } from 'sonner';
 
 const ShareModal = ({
   isOpen,
@@ -25,7 +23,7 @@ const ShareModal = ({
 }: any) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(clipBoard);
-    toast.success("Link copied to clipboard!");
+    toast.success('Link copied to clipboard!');
   };
 
   return (
@@ -36,7 +34,7 @@ const ShareModal = ({
       scrollBehavior="inside"
     >
       <ModalContent>
-        {(onClose) => (
+        {() => (
           <>
             <ModalHeader className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Share Post</h3>

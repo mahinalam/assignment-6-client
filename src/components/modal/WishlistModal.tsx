@@ -41,7 +41,7 @@ export default function WishlistModal({
                     {btn2}
                   </Button>
                   <Button
-                    className="bg-[#2abbe8]"
+                    className="bg-gray-300"
                     color="primary"
                     radius="none"
                     size="sm"

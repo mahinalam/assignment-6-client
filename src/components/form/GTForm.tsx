@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { ReactNode } from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { ReactNode } from 'react';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 interface formConfig {
   defaultValues?: Record<string, any>;
@@ -21,12 +21,12 @@ export default function GTForm({
 }: IProps) {
   const formConfig: formConfig = {};
 
-  if (!!defaultValues) {
-    formConfig["defaultValues"] = defaultValues;
+  if (defaultValues) {
+    formConfig['defaultValues'] = defaultValues;
   }
 
-  if (!!resolver) {
-    formConfig["resolver"] = resolver;
+  if (resolver) {
+    formConfig['resolver'] = resolver;
   }
 
   const methods = useForm(formConfig);

@@ -1,11 +1,7 @@
-/* eslint-disable react/jsx-key */
-/* eslint-disable prettier/prettier */
-
-import Link from "next/link";
-import React from "react";
+import Link from 'next/link';
+import React from 'react';
 
 const RecentPost = ({ recentPosts }: { recentPosts: any }) => {
-  console.log(recentPosts);
   return (
     <div>
       <div className="space-y-2">
@@ -16,9 +12,9 @@ const RecentPost = ({ recentPosts }: { recentPosts: any }) => {
           <div className=" font-bold border-1 border-[#E3BE21]" />
         </section>
         <section>
-          {recentPosts?.map((recentPost: any) => (
-            <div className="flex items-center gap-2">
-              <p className="text-[#E3BE21]">{`>`}</p>
+          {recentPosts?.map((recentPost: any, index: number) => (
+            <div key={index} className="flex items-center gap-2">
+              <p className="text-[#E3BE21]">{'>'}</p>
               <Link href={`/posts/${recentPost?._id}`}>
                 {recentPost?.title}
               </Link>

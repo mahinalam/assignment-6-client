@@ -1,19 +1,25 @@
-"use client";
-import Container from "@/src/components/Container";
-import PostCard from "@/src/components/dashboard/PostCard";
-import CreatePostModal from "@/src/components/modal/CreatePostModal";
-import { useUser } from "@/src/context/user.provider";
-import { useGetAllCategories } from "@/src/hooks/category.hook";
-import { useCreatePost, useGetUserPost } from "@/src/hooks/post.hook";
-import { IPost } from "@/src/types";
-import { useDisclosure } from "@nextui-org/modal";
-import { useQueryClient } from "@tanstack/react-query";
-import React, { useState } from "react";
-import { toast } from "sonner";
+'use client';
+import Container from '@/src/components/Container';
+import PostCard from '@/src/components/dashboard/PostCard';
+import DashboardContainer from '@/src/components/DashboardContainer';
+import DashboardPostsPageSkeleton from '@/src/components/loading-skeleton/DashboardPostsPageSkeleton';
+import UserDashboardSkeleton from '@/src/components/loading-skeleton/UserDashboardSkeleton';
+import CreatePostModal from '@/src/components/modal/CreatePostModal';
+import PaginationHelper from '@/src/components/sharred/paginationHelper';
+import { useUser } from '@/src/context/user.provider';
+import { useGetAllCategories } from '@/src/hooks/category.hook';
+import { useCreatePost, useGetAllPosts } from '@/src/hooks/post.hook';
+import { IPost } from '@/src/types';
+import { useDisclosure } from '@nextui-org/modal';
+import { useQueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
 
 const AllPosts = () => {
   const { user } = useUser();
-  const { data, isLoading } = useGetUserPost((user as any)?._id);
+  const [page, setPage] = useState(1);
+  const limit = 5;
+  const { data, isLoading } = useGetAllPosts({ user: user?._id, page, limit });
   const [createPostImageFiles, setCreatePostImageFiles] = useState<File[]>([]);
   const { data: categoriesData, isLoading: categoriesLoading } =
     useGetAllCategories();
@@ -26,26 +32,24 @@ const AllPosts = () => {
   const { mutate: createPost } = useCreatePost();
   const queryClient = useQueryClient();
 
-  if (isLoading) {
-    return <p>Loading</p>;
+  if (isLoading || categoriesLoading) {
+    return <DashboardPostsPageSkeleton />;
   }
 
-  if (categoriesLoading) {
-    return <p>Loading ...</p>;
-  }
-
-  const categories = categoriesData?.data.map((category: any) => ({
+  const categories = categoriesData?.data.data?.map((category: any) => ({
     key: category?._id,
     label: category.name,
   }));
 
   const postTypeOption = [
-    { key: "general", label: "General" },
-    { key: "premium", label: "premium" },
+    { key: 'general', label: 'General' },
+    { key: 'premium', label: 'premium' },
   ];
 
+  const totalProducts = data?.data?.meta?.total || 0;
+  const totalPages = Math.ceil(totalProducts / limit);
+
   const hanldeDeleteCreatePostImage = (deletedImage: any) => {
-    console.log({ deletedImage });
     const updatedImage = createPostImageFiles.filter(
       (image) => image.name !== deletedImage
     );
@@ -57,40 +61,38 @@ const AllPosts = () => {
   };
   // create post
   const handleCreatePost = (data: Record<string, unknown>) => {
-    const id = toast.loading("Creating post...");
+    const id = toast.loading('Creating post...');
     const formData = new FormData();
     const postData = {
       user: user!._id,
       title: data.title,
-      isPremium: data?.type === "premium" ? true : false,
       content: data.content,
       category: data.category,
+      isPremium: data?.type !== 'general',
     };
-    console.log({ postData });
-    formData.append("data", JSON.stringify(postData));
+    formData.append('data', JSON.stringify(postData));
 
     if (createPostImageFiles.length > 0) {
-      for (let image of createPostImageFiles) {
-        formData.append("itemImages", image);
+      for (const image of createPostImageFiles) {
+        formData.append('itemImages', image);
       }
     }
     createPost(formData, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["POST"] });
-        toast.success("Post created successfully", { id });
+        queryClient.invalidateQueries({ queryKey: ['POST'] });
+        toast.success('Post created successfully', { id });
         onCreatePostModalOpenChange();
       },
       onError: (error) => {
-        console.log({ error });
-        toast.error(error?.message || "Failed to update post!", { id });
+        toast.error(error?.message || 'Failed to update post!', { id });
       },
     });
   };
 
   return (
-    <div>
+    <DashboardContainer>
       <div className="lg:mb-6 flex justify-between items-center">
-        <p className="lg:text-2xl font-bold ">All Posts</p>
+        <p className="text-2xl font-bold pt-6 pb-5 lg:pt-8 mt-4">All Posts</p>
         <div className=" ">
           <button
             onClick={handleCreateModalOpen}
@@ -102,10 +104,11 @@ const AllPosts = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3  mx-auto gap-4">
-        {data?.data?.map((post: IPost) => (
-          <PostCard post={post} />
+        {data?.data?.data?.map((post: IPost, index: number) => (
+          <PostCard key={index} post={post} />
         ))}
       </div>
+      <PaginationHelper page={page} setPage={setPage} totalPages={totalPages} />
       <CreatePostModal
         isOpen={isCreatePostModalOPen}
         onOpenChange={onCreatePostModalOpenChange}
@@ -117,7 +120,7 @@ const AllPosts = () => {
         postTypeOption={postTypeOption}
         submitName="Create Post"
       />
-    </div>
+    </DashboardContainer>
   );
 };
 

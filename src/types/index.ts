@@ -1,4 +1,4 @@
-import { SVGProps } from "react";
+import { SVGProps } from 'react';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -9,12 +9,14 @@ export interface IUser {
   name: string;
   role: string;
   email: string;
-  status: string;
   mobileNumber: string;
   profilePhoto: string;
   createdAt?: string;
   updatedAt?: string;
   __v?: number;
+  isDeleted?: boolean;
+  isVerified?: boolean;
+  isTopGardener?: boolean;
 }
 
 export interface IPost {
@@ -24,25 +26,11 @@ export interface IPost {
   images: string[];
   isDeleted: boolean;
   isPremium: boolean;
-  status: "draft" | "published" | "pending" | "rejected"; // extend if needed
+  status: 'draft' | 'published' | 'pending' | 'rejected'; // extend if needed
   favoriteCount: number;
   comments: string[]; // comment IDs
-  category: {
-    _id: string;
-    name: string;
-    isDeleted: boolean;
-    createdAt: string;
-    updatedAt: string;
-  };
-  user: {
-    _id: string;
-    name: string;
-    email: string;
-    role: "USER" | "ADMIN" | string;
-    followers: string[];
-    following: string[];
-    profilePhoto?: string;
-  };
+  category: ICategory;
+  user: IUser;
 
   createdAt: string;
   updatedAt: string;
@@ -50,8 +38,8 @@ export interface IPost {
 }
 
 export interface IInput {
-  variant?: "flat" | "bordered" | "faded" | "underlined";
-  size?: "sm" | "md" | "lg";
+  variant?: 'flat' | 'bordered' | 'faded' | 'underlined';
+  size?: 'sm' | 'md' | 'lg';
   required?: boolean;
   type?: string;
   label?: string;
@@ -61,6 +49,7 @@ export interface IInput {
   placeholder?: string;
   defaultValue?: string;
   readonly?: boolean;
+  endContent?: any;
 }
 
 export interface ICategory {
@@ -74,12 +63,12 @@ export interface ICategory {
 
 export interface IBlog {
   _id: string;
-  author: string;
-  category: string;
+  author: any;
+  category: any;
   title: string;
   content: string;
   images: string[];
-  status: "pending" | "approved" | "rejected";
+  status: 'pending' | 'approved' | 'rejected';
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
@@ -91,28 +80,21 @@ export interface IWishlistItem {
   isDeleted: boolean;
   createdAt: string; // or Date if you parse it
   updatedAt: string; // or Date
-  user: {
-    _id: string;
-    name: string;
-    role: "USER" | "ADMIN" | string;
-    email: string;
-    followers: string[]; // or User[] if you have user refs
-    // Add any additional user fields you need
-  };
-  post: {
-    _id: string;
-    user: string;
-    title: string;
-    content: string;
-    category: string;
-    images: string[]; // assuming images is an array
-    status: string; // e.g., "approved"
-    isDeleted: boolean;
-    createdAt: string;
-    updatedAt: string;
-    // Add any additional post fields you need
-  };
+  user: IUser;
+  post: IPost;
   __v: number;
+}
+
+export interface IPayment {
+  _id: string;
+  transactionId: string;
+  totalPrice: number;
+  userId: IUser;
+  currency: string;
+  paymentStatus: 'paid' | 'unpaid' | 'pending'; // You can adjust based on your enum
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
 }
 
 export type TQueryParam = {

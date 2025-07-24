@@ -1,42 +1,20 @@
-"use server";
+'use server';
 
-import axiosInstance from "@/src/lib/AxiosInstance";
+import axiosInstance from '@/src/lib/AxiosInstance';
 
-// export const createPost = async (formData: FormData): Promise<any> => {
+// export const getAllPayments = async () => {
 //   try {
-//     const { data } = await axiosInstance.post("/gardening-posts", formData, {
-//       headers: {
-//         "Content-Type": "multipart/form-data",
-//       },
-//     });
-
-//     // revalidateTag("posts");
-
+//     const { data } = await axiosInstance.get("/payment");
 //     return data;
 //   } catch (error: any) {
-//     console.log(error.message);
-//     throw new Error(error.message);
+//     throw new Error(error);
 //   }
 // };
-
-export const deletePayment = async (id: string): Promise<any> => {
+// services/payment.service.ts
+export const getAllPayments = async (params?: { [key: string]: any }) => {
+  const searchParams = new URLSearchParams(params).toString();
   try {
-    const { data } = await axiosInstance.delete(`/payment/${id}`);
-
-    return data;
-  } catch (error: any) {
-    console.log(error.message);
-    throw new Error(error.message);
-  }
-};
-
-export const getAllPayments = async (query?: { userId?: string }) => {
-  try {
-    let endpoint = "/payment/get-all-payments";
-    if (query?.userId) {
-      endpoint += `?userId=${query.userId}`;
-    }
-    const { data } = await axiosInstance.get(endpoint);
+    const { data } = await axiosInstance.get(`/payment?${searchParams}`);
     return data;
   } catch (error: any) {
     throw new Error(error);
@@ -55,22 +33,23 @@ export const getAllUserPayments = async (userId: string) => {
   }
 };
 
-export const getSingleGardeningPost = async (id: string) => {
+// check is user verified
+export const isUserVerified = async () => {
   try {
-    const { data } = await axiosInstance.get(`/gardening-posts/${id}`);
+    const { data } = await axiosInstance.get('/payment/isVerified');
 
     return data;
   } catch (error: any) {
     throw new Error(error);
   }
 };
-// check is user verified
-export const isUserVerified = async () => {
+
+export const deletePayment = async (id: string): Promise<any> => {
   try {
-    const { data } = await axiosInstance.get(`/payment/isVerified`);
+    const { data } = await axiosInstance.delete(`/payment/${id}`);
 
     return data;
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(error.message);
   }
 };
