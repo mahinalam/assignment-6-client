@@ -68,9 +68,6 @@ const LeftSection = () => {
     router.push(query ? `${pathname}?${query}` : pathname);
   }, [searchValue]);
   const isLoginOrSignUp = pathname === "/login" || pathname === "/register";
-  if (!isLoginOrSignUp && leftSectionLoading) {
-    return <LeftSectionSkeleton />;
-  }
 
   // Clear search handler (optional: guard pathname here too)
   const clearSearch = () => {
