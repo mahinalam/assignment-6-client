@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useDisclosure } from "@nextui-org/react";
-import Container from "@/src/components/Container";
-import GTForm from "@/src/components/form/GTForm";
-import GTInput from "@/src/components/form/GTInput";
-import { useUser } from "@/src/context/user.provider";
-import { useGetSingleUser, useUpdateMyProfile } from "@/src/hooks/auth.hook";
-import EditProfileSkeleton from "@/src/components/loading-skeleton/EditProfileSkeleton";
+import React, { useState } from 'react';
+import { FieldValues, SubmitHandler } from 'react-hook-form';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { useDisclosure } from '@nextui-org/react';
+import Container from '@/src/components/Container';
+import GTForm from '@/src/components/form/GTForm';
+import GTInput from '@/src/components/form/GTInput';
+import { useUser } from '@/src/context/user.provider';
+import { useGetSingleUser, useUpdateMyProfile } from '@/src/hooks/auth.hook';
+import EditProfileSkeleton from '@/src/components/loading-skeleton/EditProfileSkeleton';
 
 const EditProfile = () => {
   const { user } = useUser();
@@ -26,15 +26,15 @@ const EditProfile = () => {
     useUpdateMyProfile(user?._id as string);
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    const id = toast.loading("Updating profile...");
+    const id = toast.loading('Updating profile...');
     const formData = new FormData();
-    formData.append("data", JSON.stringify(data));
-    if (imageFile) formData.append("profilePhoto", imageFile);
+    formData.append('data', JSON.stringify(data));
+    if (imageFile) formData.append('profilePhoto', imageFile);
 
     updateMyProfile(formData, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["USER", user?._id] });
-        toast.success("Profile updated successfully.", { id });
+        queryClient.invalidateQueries({ queryKey: ['USER', user?._id] });
+        toast.success('Profile updated successfully.', { id });
         setImageFile(undefined);
         setIsSubmitButtonOpen(false);
       },
@@ -57,7 +57,7 @@ const EditProfile = () => {
                 alt="Profile"
                 className="w-20 h-20 rounded-full object-cover"
                 src={
-                  currentUserInfo?.data?.profilePhoto || "/default-avatar.png"
+                  currentUserInfo?.data?.profilePhoto || '/default-avatar.png'
                 }
               />
               <div className="text-sm sm:text-base">
@@ -120,7 +120,7 @@ const EditProfile = () => {
               <label
                 aria-label="Upload Your Files"
                 className={
-                  "flex cursor-pointer items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all"
+                  'flex cursor-pointer items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all'
                 }
                 htmlFor="image"
               >

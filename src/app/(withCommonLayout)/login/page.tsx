@@ -98,14 +98,18 @@ import registerValidationSchema from "@/src/schemas/register.schema";
 import loginValidationSchema from "@/src/schemas/login.schema";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { getCurrentUser } from "@/src/services/AuthService";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setIsLoading: userLoading } = useUser();
+  const { setIsLoading: setUserLoading } = useUser();
+  const queryClient = useQueryClient();
 
   const { mutate: handleUserLogin, isPending, isSuccess } = useUserLogin();
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    setUserLoading(true);
     const id = toast.loading("Logging in...");
     handleUserLogin(data, {
       onSuccess: () => {
@@ -117,9 +121,7 @@ export default function LoginPage() {
         });
       },
     });
-    userLoading(true);
   };
-
   useEffect(() => {
     if (!isPending && isSuccess) {
       router.push("/");
@@ -131,10 +133,15 @@ export default function LoginPage() {
     email: string;
     password: string;
   }) => {
+    setUserLoading(true);
     const id = toast.loading("Logging in...");
 
     handleUserLogin(data, {
-      onSuccess: () => {
+      onSuccess: async () => {
+        const result = await getCurrentUser();
+        queryClient.invalidateQueries({
+          queryKey: ["SINGLE_USER", result?._id],
+        });
         toast.success("Login successful! Welcome back 🎉", { id });
       },
       onError: () => {

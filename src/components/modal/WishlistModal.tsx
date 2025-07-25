@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Modal,
@@ -7,7 +7,7 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-} from "@nextui-org/react";
+} from '@nextui-org/react';
 
 export default function WishlistModal({
   isOpen,

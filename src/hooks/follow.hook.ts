@@ -1,15 +1,15 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   followUser,
   getFollowersAndFollwingUser,
   removeFollower,
   unFollowUser,
-} from "../services/FollweService";
+} from '../services/FollweService';
 
 // follow user
 export const useFollowUser = (followerId: string, followingId: string) => {
   return useMutation<any, Error, any>({
-    mutationKey: ["FOLLOW"],
+    mutationKey: ['FOLLOW'],
     mutationFn: async (commentData) => await followUser(commentData),
   });
 };
@@ -17,7 +17,7 @@ export const useFollowUser = (followerId: string, followingId: string) => {
 // unfollow user
 export const useUnFollowUser = () => {
   return useMutation<any, Error, any>({
-    mutationKey: ["FOLLOW"],
+    mutationKey: ['FOLLOW'],
     mutationFn: async (commentData) => await unFollowUser(commentData),
   });
 };
@@ -26,14 +26,14 @@ export const useUnFollowUser = () => {
 export const useRemoveFollower = () => {
   return useMutation<any, Error, any>({
     mutationFn: async (followerId) => await removeFollower(followerId),
-    mutationKey: ["FOLLOW"],
+    mutationKey: ['FOLLOW'],
   });
 };
 
 // get follower and following user
 export const useGetFollwersAndFollwingUser = (userId: string) => {
   return useQuery({
-    queryKey: ["FOLLOW"],
+    queryKey: ['FOLLOW'],
     queryFn: async () => await getFollowersAndFollwingUser(userId),
     enabled: !!userId,
   });

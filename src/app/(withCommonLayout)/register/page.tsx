@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@nextui-org/button';
-import Link from 'next/link';
-import { useState } from 'react';
-import { FieldValues, SubmitHandler } from 'react-hook-form';
-import GTForm from '@/src/components/form/GTForm';
-import GTInput from '@/src/components/form/GTInput';
-import { useUser } from '@/src/context/user.provider';
-import { useUserRegistration } from '@/src/hooks/auth.hook';
-import registerValidationSchema from '@/src/schemas/register.schema';
-import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@nextui-org/button";
+import Link from "next/link";
+import { useState } from "react";
+import { FieldValues, SubmitHandler } from "react-hook-form";
+import GTForm from "@/src/components/form/GTForm";
+import GTInput from "@/src/components/form/GTInput";
+import { useUser } from "@/src/context/user.provider";
+import { useUserRegistration } from "@/src/hooks/auth.hook";
+import registerValidationSchema from "@/src/schemas/register.schema";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function RegisterPage() {
   const { mutate: handleUserRegistration, isPending } = useUserRegistration();
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const { setIsLoading: userLoading } = useUser();
+  const { setIsLoading } = useUser();
   const [isHaveProfileImage, setHaveProfileImage] = useState(true);
   const queryClient = useQueryClient();
 
@@ -25,28 +25,27 @@ export default function RegisterPage() {
       setHaveProfileImage(false);
       return;
     }
-
-    const id = toast.loading('Registering your account, please wait...');
+    setIsLoading(true);
+    const id = toast.loading("Registering your account, please wait...");
     const formData = new FormData();
 
     const userData = {
       ...data,
     };
-    formData.append('data', JSON.stringify(userData));
-    formData.append('profileImage', imageFile as File);
+    formData.append("data", JSON.stringify(userData));
+    formData.append("profileImage", imageFile as File);
     handleUserRegistration(formData, {
       onSuccess: () => {
-        toast.success('Registration successful! Welcome GreenHaven 🎉', { id });
-        queryClient.invalidateQueries({ queryKey: ['USER'] });
+        toast.success("Registration successful! Welcome GreenHaven 🎉", { id });
+        queryClient.invalidateQueries({ queryKey: ["USER"] });
       },
       onError: () => {
         toast.error(
-          'Registration failed. Please check your information and try again.',
+          "Registration failed. Please check your information and try again.",
           { id }
         );
       },
     });
-    userLoading(true);
   };
 
   return (
@@ -83,7 +82,7 @@ export default function RegisterPage() {
             <label
               aria-label="Upload Your Files"
               className={
-                'flex cursor-pointer hover:bg-athens-gray-50/10 items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all'
+                "flex cursor-pointer hover:bg-athens-gray-50/10 items-center gap-3 rounded border border-dashed border-athens-gray-200 bg-white p-3 transition-all"
               }
               htmlFor="image"
             >
@@ -191,7 +190,7 @@ export default function RegisterPage() {
           </Button>
         </GTForm>
         <div className="text-center">
-          Already have an account ? <Link href={'/login'}>Login</Link>
+          Already have an account ? <Link href={"/login"}>Login</Link>
         </div>
       </div>
     </div>

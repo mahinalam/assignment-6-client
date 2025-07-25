@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import Container from "@/src/components/Container";
-import { useGetAllPosts, useGetAllSharePosts } from "@/src/hooks/post.hook";
-import Loading from "@/src/components/UI/Loading";
-import RightSection from "@/src/components/sharred/RightSection";
-import { ICategory, IPost } from "@/src/types";
-import PostCard from "@/src/components/home/PostCard";
-import { useSearchParams } from "next/navigation";
-import SkeletonLoading from "@/src/components/UI/SkeletonLoading";
-import PostsNotFound from "@/src/components/home/NotFoundPost";
-import { Button } from "@nextui-org/button";
-import { useGetAllCategories } from "@/src/hooks/category.hook";
-import HomePageFullSkeleton from "../loading-skeleton/HomeSkeleton";
+import Container from '@/src/components/Container';
+import { useGetAllPosts, useGetAllSharePosts } from '@/src/hooks/post.hook';
+import Loading from '@/src/components/UI/Loading';
+import RightSection from '@/src/components/sharred/RightSection';
+import { ICategory, IPost } from '@/src/types';
+import PostCard from '@/src/components/home/PostCard';
+import { useSearchParams } from 'next/navigation';
+import SkeletonLoading from '@/src/components/UI/SkeletonLoading';
+import PostsNotFound from '@/src/components/home/NotFoundPost';
+import { Button } from '@nextui-org/button';
+import { useGetAllCategories } from '@/src/hooks/category.hook';
+import HomePageFullSkeleton from '../loading-skeleton/HomeSkeleton';
 
 const Home = () => {
   const [page, setPage] = useState(1);
   const limit = 5;
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categoryValue, setCategoryValue] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryValue, setCategoryValue] = useState('');
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const {
@@ -34,7 +34,7 @@ const Home = () => {
   });
 
   const searchParams = useSearchParams();
-  const value = searchParams.get("search");
+  const value = searchParams.get('search');
   const { data: categoriesData } = useGetAllCategories();
   const { data: sharePosts } = useGetAllSharePosts();
   const [postDataLoading, setPostDataLoading] = useState(true);
@@ -73,10 +73,10 @@ const Home = () => {
         <Button
           className={
             !categoryValue
-              ? "bg-primary text-white hover:bg-green-700"
-              : "bg-gray-100 hover:bg-gray-200"
+              ? 'bg-primary text-white hover:bg-green-700'
+              : 'bg-gray-100 hover:bg-gray-200'
           }
-          onClick={() => setCategoryValue("")}
+          onClick={() => setCategoryValue('')}
         >
           All
         </Button>
@@ -85,12 +85,12 @@ const Home = () => {
             key={index}
             className={
               categoryValue === item._id
-                ? "bg-primary text-white hover:bg-green-700"
-                : "bg-gray-100 hover:bg-gray-200"
+                ? 'bg-primary text-white hover:bg-green-700'
+                : 'bg-gray-100 hover:bg-gray-200'
             }
             onClick={() => handleCategoryValue(item._id)}
           >
-            {" "}
+            {' '}
             {item.name}
           </Button>
         ))}

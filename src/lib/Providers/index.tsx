@@ -8,6 +8,7 @@ import { ThemeProviderProps } from 'next-themes/dist/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import UserProvider from '@/src/context/user.provider';
 
 export interface ProvidersProps {
@@ -28,6 +29,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
           <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
         </NextUIProvider>
       </UserProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
