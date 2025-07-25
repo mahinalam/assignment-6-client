@@ -106,7 +106,7 @@ const LeftSection = () => {
         className={`${
           isLoginOrSignUp
             ? "hidden"
-            : "block w-2/12 border-r-2 fixed p-5 inset-0"
+            : "block xl:w-2/12 lg:w-3/12 border-r-2 fixed p-5 inset-0"
         }`}
       >
         <Input

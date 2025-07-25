@@ -24,11 +24,11 @@
 
 // ✅ app/layout.tsx (remains a Server Component)
 
-import { Suspense } from 'react';
-import LeftSection from '@/src/components/sharred/LeftSection';
-import { Navbar } from '@/src/components/UI/Navbar';
-import SkeletonLoading from '@/src/components/UI/SkeletonLoading';
-import LeftSectionSkeleton from '@/src/components/UI/LeftSkeleton';
+import { Suspense } from "react";
+import LeftSection from "@/src/components/sharred/LeftSection";
+import { Navbar } from "@/src/components/UI/Navbar";
+import SkeletonLoading from "@/src/components/UI/SkeletonLoading";
+import LeftSectionSkeleton from "@/src/components/UI/LeftSkeleton";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -39,12 +39,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Suspense>
       </div>
       <div className="flex p-5">
-        <div className="w-2/12 lg:block hidden">
+        <div className="xl:w-2/12 lg:w-3/12 w-2/12 lg:block hidden">
           <Suspense fallback={<LeftSectionSkeleton />}>
             <LeftSection />
           </Suspense>
         </div>
-        <div className="lg:w-10/12 w-full lg:ml-auto  ">{children}</div>
+        <div className="xl:w-10/12 lg:w-9/12 w-full lg:ml-auto  ">
+          {children}
+        </div>
       </div>
     </div>
   );
