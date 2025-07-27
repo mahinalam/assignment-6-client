@@ -32,7 +32,7 @@ import LeftSectionSkeleton from '@/src/components/UI/LeftSkeleton';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div>
+    <div className="lg:w-[90%] xl:w-[80%] w-full mx-auto">
       <div className="block lg:hidden">
         <Suspense fallback={<SkeletonLoading />}>
           <Navbar />

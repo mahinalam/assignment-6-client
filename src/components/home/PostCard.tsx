@@ -164,7 +164,7 @@ const PostCard = ({ item }: { item: IPost; refetch?: any }) => {
       : `${title} post has been added to saved post.`;
 
   return (
-    <div className="space-y-2 mt-1 md:w-[80%] w-full mx-auto h-auto">
+    <div className="space-y-2 mt-1  h-auto">
       {' '}
       <div className="flex justify-between">
         <Link
@@ -224,8 +224,8 @@ const PostCard = ({ item }: { item: IPost; refetch?: any }) => {
             <Image
               src={images[0]}
               alt="Post Image"
-              width={800} // or whatever fits your layout
-              height={600}
+              width={700} // or whatever fits your layout
+              height={500}
               className="w-full h-full object-cover"
             />
           ) : (

@@ -1,122 +1,43 @@
-// // "use client";
+'use client';
 
-// // import WithSuspense from "@/src/components/sharred/WithSuspense";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@nextui-org/button';
+import Link from 'next/link';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { FieldValues, SubmitHandler } from 'react-hook-form';
 
-// // const LoginPageContent = () => {
-// //   return (
-// //     <WithSuspense>
-// //       <LoginPageComponent />
-// //     </WithSuspense>
-// //   );
-// // };
-
-// // export default LoginPageContent;
-
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-// "use client";
-
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { Button } from "@nextui-org/button";
-// import Link from "next/link";
-// import { ChangeEvent, useState } from "react";
-// import { FieldValues, SubmitHandler } from "react-hook-form";
-
-// import GTForm from "@/src/components/form/GTForm";
-// import GTInput from "@/src/components/form/GTInput";
-// import { useUser } from "@/src/context/user.provider";
-// import { useUserRegistration } from "@/src/hooks/auth.hook";
-// import registerValidationSchema from "@/src/schemas/register.schema";
-
-// export default function LoginPage() {
-//   const { mutate: handleUserRegistration, isPending } = useUserRegistration();
-//   const [imageFiles, setImageFiles] = useState<File | null>(null);
-//   const [imagePreviews, setImagePreviews] = useState<any>(null);
-//   const { setIsLoading: userLoading } = useUser();
-
-//   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-//     const formData = new FormData();
-
-//     const userData = {
-//       ...data,
-//     };
-
-//     formData.append("data", JSON.stringify(userData));
-//     formData.append("profileImage", imageFiles as File);
-//     handleUserRegistration(formData);
-//     userLoading(true);
-//   };
-
-//   return (
-//     <div className="flex  flex-col items-center justify-center">
-//       <h3 className="my-2 text-2xl font-bold">Login with GreenHaven</h3>
-//       <p className="mb-4">Welcome Back! Let&rsquo;s Get Started</p>
-//       <div className="lg:w-[40%] w-full">
-//         <GTForm
-//           resolver={zodResolver(registerValidationSchema)}
-//           onSubmit={onSubmit}
-//         >
-//           <div className="py-3">
-//             <GTInput label="Email" name="email" size="sm" />
-//           </div>
-
-//           <div className="py-3">
-//             <GTInput
-//               label="Password"
-//               name="password"
-//               size="sm"
-//               type="password"
-//             />
-//           </div>
-//           <Button
-//             className="my-3 w-full rounded-md font-semibold text-blue-600 bg-transparent"
-//             size="lg"
-//             type="submit"
-//           >
-//             Login
-//           </Button>
-//         </GTForm>
-//         <div className="text-center">
-//           Don&rsquo;t have an account? <Link href="/register">Register</Link>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-"use client";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
-import Link from "next/link";
-import { ChangeEvent, useEffect, useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
-
-import GTForm from "@/src/components/form/GTForm";
-import GTInput from "@/src/components/form/GTInput";
-import { useUser } from "@/src/context/user.provider";
-import { useUserLogin, useUserRegistration } from "@/src/hooks/auth.hook";
-import registerValidationSchema from "@/src/schemas/register.schema";
-import loginValidationSchema from "@/src/schemas/login.schema";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { getCurrentUser } from "@/src/services/AuthService";
-import { useQueryClient } from "@tanstack/react-query";
+import GTForm from '@/src/components/form/GTForm';
+import GTInput from '@/src/components/form/GTInput';
+import { useUser } from '@/src/context/user.provider';
+import { useUserLogin, useUserRegistration } from '@/src/hooks/auth.hook';
+import registerValidationSchema from '@/src/schemas/register.schema';
+import loginValidationSchema from '@/src/schemas/login.schema';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { getCurrentUser } from '@/src/services/AuthService';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setIsLoading: setUserLoading } = useUser();
+  const { setIsLoading: setUserLoading, setUser } = useUser();
   const queryClient = useQueryClient();
 
   const { mutate: handleUserLogin, isPending, isSuccess } = useUserLogin();
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setUserLoading(true);
-    const id = toast.loading("Logging in...");
+    const id = toast.loading('Logging in...');
     handleUserLogin(data, {
-      onSuccess: () => {
-        toast.success("Login successful! Welcome back 🎉", { id });
+      onSuccess: async () => {
+        const result = await getCurrentUser();
+        setUserLoading(true);
+        toast.success('Login successful! Welcome back 🎉', { id });
+        queryClient.invalidateQueries({
+          queryKey: ['SINGLE_USER', result?._id],
+        });
       },
       onError: () => {
-        toast.error("Login failed. Please check your email and password.", {
+        toast.error('Login failed. Please check your email and password.', {
           id,
         });
       },
@@ -124,7 +45,7 @@ export default function LoginPage() {
   };
   useEffect(() => {
     if (!isPending && isSuccess) {
-      router.push("/");
+      router.push('/');
     }
   }, [isPending, isSuccess]);
 
@@ -134,18 +55,19 @@ export default function LoginPage() {
     password: string;
   }) => {
     setUserLoading(true);
-    const id = toast.loading("Logging in...");
+    const id = toast.loading('Logging in...');
 
     handleUserLogin(data, {
       onSuccess: async () => {
         const result = await getCurrentUser();
+        setUser(result);
         queryClient.invalidateQueries({
-          queryKey: ["SINGLE_USER", result?._id],
+          queryKey: ['SINGLE_USER', result?._id],
         });
-        toast.success("Login successful! Welcome back 🎉", { id });
+        toast.success('Login successful! Welcome back 🎉', { id });
       },
       onError: () => {
-        toast.error("Login failed. Please check your email and password.", {
+        toast.error('Login failed. Please check your email and password.', {
           id,
         });
       },
@@ -163,8 +85,8 @@ export default function LoginPage() {
             className="bg-primary p-2 text-white rounded-lg text-sm"
             onClick={() =>
               handleCredentailsLogin({
-                email: "user@gmail.com",
-                password: "123456",
+                email: 'user@gmail.com',
+                password: '123456',
               })
             }
           >
@@ -174,8 +96,8 @@ export default function LoginPage() {
             className="bg-primary p-2 text-white rounded-lg text-sm"
             onClick={() =>
               handleCredentailsLogin({
-                email: "mahin@gmail.com",
-                password: "123456",
+                email: 'mahin@gmail.com',
+                password: '123456',
               })
             }
           >

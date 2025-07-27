@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Button } from '@nextui-org/button';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from "react";
+import { Button } from "@nextui-org/button";
+import { useRouter } from "next/navigation";
 import {
   Tabs,
   Tab,
@@ -17,29 +17,29 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from '@nextui-org/react'; // Modal-related imports
+} from "@nextui-org/react"; // Modal-related imports
 
-import { useGetSingleUser, useVerifyUserProfile } from '@/src/hooks/auth.hook';
-import { useGetAllPosts, useGetUserSavedPosts } from '@/src/hooks/post.hook';
-import { useUser } from '@/src/context/user.provider';
-import Container from '@/src/components/Container';
-import FollowerCard from '@/src/components/profile/FolowerCard';
-import Loading from '@/src/components/UI/Loading';
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import PostImageCard from './PostImageCard';
-import { useGetPostReacts } from '@/src/hooks/react.hook';
-import ProfileSkeleton from './Loading';
+import { useGetSingleUser, useVerifyUserProfile } from "@/src/hooks/auth.hook";
+import { useGetAllPosts, useGetUserSavedPosts } from "@/src/hooks/post.hook";
+import { useUser } from "@/src/context/user.provider";
+import Container from "@/src/components/Container";
+import FollowerCard from "@/src/components/profile/FolowerCard";
+import Loading from "@/src/components/UI/Loading";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import PostImageCard from "./PostImageCard";
+import { useGetPostReacts } from "@/src/hooks/react.hook";
+import ProfileSkeleton from "./Loading";
 import {
   useFollowUser,
   useGetFollwersAndFollwingUser,
   useRemoveFollower,
   useUnFollowUser,
-} from '@/src/hooks/follow.hook';
-import PaginationHelper from '@/src/components/sharred/paginationHelper';
-import { IoIosArrowDown } from 'react-icons/io';
-import DeleteModal from '@/src/components/modal/DeleteModal';
-import VerificationModal from '@/src/components/modal/VerificationModal';
+} from "@/src/hooks/follow.hook";
+import PaginationHelper from "@/src/components/sharred/paginationHelper";
+import { IoIosArrowDown } from "react-icons/io";
+import DeleteModal from "@/src/components/modal/DeleteModal";
+import VerificationModal from "@/src/components/modal/VerificationModal";
 
 const ProfilePage = ({ params }: { params: { userId: string } }) => {
   const queryClient = useQueryClient();
@@ -50,7 +50,8 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
   const savedPostLimit = 6;
   const router = useRouter();
 
-  const { user: curentUserInfo } = useUser();
+  // const { user: curentUserInfo, isLoading } = useUser();
+  const { user: curentUserInfo, isLoading: userContextLoading } = useUser();
 
   const { data: savedPosts, isLoading: savedPOstLoading } =
     useGetUserSavedPosts({
@@ -66,17 +67,20 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
       limit,
     }
   );
+
+  const userId = params?.userId;
+
   const { data: currentUserData, isLoading: currentUserDataLoading } =
     useGetSingleUser(params?.userId);
   const { data: followersAndFollowingUserData, isLoading: followerLoading } =
     useGetFollwersAndFollwingUser(params?.userId as string);
 
-  const [removeFollowerId, setRemoveFollowerId] = useState('');
-  const [unFollowUserId, setUnFollowUserId] = useState('');
-  const [followingUserId, setFollowingUserId] = useState('');
+  const [removeFollowerId, setRemoveFollowerId] = useState("");
+  const [unFollowUserId, setUnFollowUserId] = useState("");
+  const [followingUserId, setFollowingUserId] = useState("");
   const [unFollowFollowingUser, setUnFollowFollowingUser] = useState({
-    _id: '',
-    name: '',
+    _id: "",
+    name: "",
   });
   const {
     mutate: verifyProfile,
@@ -121,12 +125,14 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
     onOpen: onVerifyModalOpen,
     onOpenChange: onVerifyModalOpenChange,
   } = useDisclosure();
-
   const posts = userPostInfo?.data;
 
-  if (currentUserDataLoading) {
-    return <ProfileSkeleton />;
+  if (userContextLoading || !curentUserInfo) {
+    return <ProfileSkeleton />; // or any loader
   }
+  // if (currentUserDataLoading) {
+  //   return <ProfileSkeleton />;
+  // }
   const totalProducts = userPostInfo?.data?.meta?.total || 0;
   const totalPages = Math.ceil(totalProducts / limit);
 
@@ -163,7 +169,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
           onSuccess: () => {
             queryClient.invalidateQueries({
               // queryKey: ["FOLLOW", curentUserInfo?._id, unFollowUserId],
-              queryKey: ['FOLLOW'],
+              queryKey: ["FOLLOW"],
             });
           },
         }
@@ -178,7 +184,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: ['FOLLOW'],
+            queryKey: ["FOLLOW"],
           });
         },
       }
@@ -193,7 +199,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
         { followerUserId: followerId },
         {
           onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['FOLLOW'] });
+            queryClient.invalidateQueries({ queryKey: ["FOLLOW"] });
           },
         }
       );
@@ -206,7 +212,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
     await verifyProfile();
     if (isSuccess) {
       queryClient.invalidateQueries({
-        queryKey: ['USER', params.userId, 'PAYMENT'],
+        queryKey: ["USER", params.userId, "PAYMENT"],
       });
       setVerifyLoading(false);
       onVerifyModalOpenChange();
@@ -246,7 +252,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
   };
 
   return (
-    <div className="lg:w-[70%] w-full mx-auto mt-[64px] lg:mt-0">
+    <div className="lg:w-[70%] w-full mx-auto mt-[106px] lg:mt-0">
       <div className="flex flex-col md:flex-row md:items-start md:gap-10 items-center">
         {/* Profile Image */}
         <div className="flex justify-center">
@@ -290,7 +296,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
                 Array.isArray(isFollower) && isFollower.length > 0 ? (
                   <Button
                     className={
-                      curentUserInfo?.role === 'ADMIN' ? 'hidden' : 'block'
+                      curentUserInfo?.role === "ADMIN" ? "hidden" : "block"
                     }
                     size="sm"
                     onClick={() =>
@@ -307,7 +313,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
                 ) : (
                   <Button
                     className={
-                      curentUserInfo?.role === 'ADMIN' ? 'hidden' : 'block'
+                      curentUserInfo?.role === "ADMIN" ? "hidden" : "block"
                     }
                     size="sm"
                     onClick={() => handleFollowUser(params?.userId)}
@@ -319,16 +325,16 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
                 <>
                   <Button
                     size="sm"
-                    onClick={() => router.push('/profile/edit-profile')}
+                    onClick={() => router.push("/profile/edit-profile")}
                   >
                     Edit Profile
                   </Button>
                   {!curentUserInfo?.isVerified && (
                     <Button
                       className={` ${
-                        curentUserInfo?.role === 'ADMIN'
-                          ? 'hidden'
-                          : 'hidden lg:block'
+                        curentUserInfo?.role === "ADMIN"
+                          ? "hidden"
+                          : "hidden lg:block"
                       }`}
                       size="sm"
                       onClick={onVerifyModalOpen}
@@ -342,27 +348,27 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
           </div>
 
           {/* Stats: posts, followers, following */}
-          {curentUserInfo?.role === 'USER' && (
+          {curentUserInfo?.role === "USER" && (
             <div className="flex justify-center md:justify-start gap-8 mt-4">
               <div>
                 <span className="font-bold">{posts?.data?.length}</span> posts
               </div>
               <div
-                className={`${isOwnProfile ? 'cursor-pointer' : ''}`}
+                className={`${isOwnProfile ? "cursor-pointer" : ""}`}
                 onClick={handleFollowerModalOpen}
               >
                 <span className="font-bold">
-                  {followersAndFollowingUserData?.data?.followers?.length || 0}{' '}
+                  {followersAndFollowingUserData?.data?.followers?.length || 0}{" "}
                 </span>
                 followers
               </div>
               <div
-                className={`${isOwnProfile ? 'cursor-pointer' : ''}`}
+                className={`${isOwnProfile ? "cursor-pointer" : ""}`}
                 onClick={handleFollowingModalOpen}
               >
                 <span className="font-bold">
                   {followersAndFollowingUserData?.data?.followingUser?.length ||
-                    0}{' '}
+                    0}{" "}
                 </span>
                 following
               </div>
@@ -379,7 +385,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
       </div>
       {/* Marked: Modal ends */}
       <div>
-        {curentUserInfo?.role === 'USER' && (
+        {curentUserInfo?.role === "USER" && (
           <div className="flex w-full mt-6 lg:mt-8 flex-col">
             <Tabs aria-label="Options" variant="solid">
               <Tab key="posts" title="POSTS">
@@ -438,7 +444,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
         size="md"
         onClose={onFollowerModalClose}
       >
-        {' '}
+        {" "}
         {/* Marked: Modal starts */}
         <ModalContent>
           {(onClose) => (
@@ -473,14 +479,14 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
             </>
           )}
         </ModalContent>
-      </Modal>{' '}
+      </Modal>{" "}
       <Modal
         isOpen={isFollowingModalOpen}
         scrollBehavior="inside"
         size="md"
         onClose={onFollowingModalClose}
       >
-        {' '}
+        {" "}
         {/* Marked: Modal starts */}
         <ModalContent>
           {(onClose) => (
@@ -518,7 +524,7 @@ const ProfilePage = ({ params }: { params: { userId: string } }) => {
             </>
           )}
         </ModalContent>
-      </Modal>{' '}
+      </Modal>{" "}
       <DeleteModal
         title={`Unfollow ${currentUserData?.data?.name}`}
         subTitle={`Are you sure want to unfollow ${currentUserData?.data?.name}?`}

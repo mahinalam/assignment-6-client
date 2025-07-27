@@ -56,14 +56,18 @@ const RightSection = () => {
           )}
         </div>
         <div>
-          <p className="lg:text-sm">{currentUserInfo?.data?.email}</p>
-          <p className="text-subTitle ">{currentUserInfo?.data?.name}</p>
+          <p className="lg:text-sm hover:underline">
+            {currentUserInfo?.data?.email}
+          </p>
+          <p className="text-subTitle hover:underline">
+            {currentUserInfo?.data?.name}
+          </p>
         </div>
       </Link>
 
       {/* suggessted posts */}
       <div>
-        <p className="lg:text-lg w-[80%] border-b-4 border-b-border text-subTitle lg:mt-8 mb-5 pb-2">
+        <p className="lg:text-lg  border-b-4 border-b-border text-subTitle lg:mt-8 mb-5 pb-2">
           Recent Posts
         </p>
         {!isLoading &&

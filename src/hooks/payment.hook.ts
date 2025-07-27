@@ -20,14 +20,6 @@ export const useDeletePayment = () => {
   });
 };
 
-// export const useGetAllPayments = () => {
-//   return useQuery({
-//     queryKey: ["PAYMENT"],
-//     queryFn: async () => await getAllPayments(),
-//   });
-// };
-// hooks/payment.hook.ts
-
 export const useGetAllPayments = (params?: { [key: string]: any }) => {
   return useQuery({
     queryKey: ['PAYMENT', params], // important for caching and refetching

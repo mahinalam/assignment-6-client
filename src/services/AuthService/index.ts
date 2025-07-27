@@ -1,11 +1,11 @@
-'use server';
+"use server";
 
-import { cookies } from 'next/headers';
-import { FieldValues } from 'react-hook-form';
-import { jwtDecode } from 'jwt-decode';
-import axios from 'axios';
+import { cookies } from "next/headers";
+import { FieldValues } from "react-hook-form";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
-import axiosInstance from '@/src/lib/AxiosInstance';
+import axiosInstance from "@/src/lib/AxiosInstance";
 
 // get single user
 export const getSingleUser = async (userId: string) => {
@@ -36,14 +36,14 @@ export const registerUser = async (formData: FormData): Promise<any> => {
       formData,
       {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       }
     );
 
     if (data.success) {
-      cookies().set('accessToken', data?.data?.accessToken);
-      cookies().set('refreshToken', data?.data?.refreshToken);
+      cookies().set("accessToken", data?.data?.accessToken);
+      cookies().set("refreshToken", data?.data?.refreshToken);
     }
 
     return data;
@@ -60,8 +60,8 @@ export const loginUser = async (userData: FieldValues) => {
     );
 
     if (data.success) {
-      cookies().set('accessToken', data?.data?.accessToken);
-      cookies().set('refreshToken', data?.data?.refreshToken);
+      cookies().set("accessToken", data?.data?.accessToken);
+      cookies().set("refreshToken", data?.data?.refreshToken);
     }
 
     return data;
@@ -71,13 +71,13 @@ export const loginUser = async (userData: FieldValues) => {
 };
 
 export const logout = () => {
-  cookies().delete('accessToken');
-  cookies().delete('refreshToken');
+  cookies().delete("accessToken");
+  cookies().delete("refreshToken");
 };
 
 export const verifyProfile = async (): Promise<any> => {
   try {
-    const { data } = await axiosInstance.post('/payment/verify-profile');
+    const { data } = await axiosInstance.post("/payment/verify-profile");
 
     return data;
   } catch (error: any) {
@@ -89,7 +89,7 @@ export const followUser = async (
   userIds: Record<string, unknown>
 ): Promise<any> => {
   try {
-    const { data } = await axiosInstance.put('/users/follow-users', userIds);
+    const { data } = await axiosInstance.put("/users/follow-users", userIds);
 
     return data;
   } catch (error: any) {
@@ -102,7 +102,7 @@ export const unFollowUser = async (
   userIds: Record<string, unknown>
 ): Promise<any> => {
   try {
-    const { data } = await axiosInstance.put('/users/unfollow-users', userIds);
+    const { data } = await axiosInstance.put("/users/unfollow-users", userIds);
 
     return data;
   } catch (error: any) {
@@ -113,7 +113,7 @@ export const unFollowUser = async (
 export const checkFollower = async (ids: Record<string, unknown>) => {
   try {
     const { data } = await axios.post(
-      'http://localhost:5000/users/check-follower',
+      "http://localhost:5000/users/check-follower",
       ids
     );
 
@@ -134,7 +134,7 @@ export const deleteUser = async (userId: string): Promise<any> => {
 };
 
 export const getCurrentUser = () => {
-  const accessToken = cookies().get('accessToken')?.value;
+  const accessToken = cookies().get("accessToken")?.value;
 
   if (!accessToken) return null;
 
@@ -156,11 +156,11 @@ export const getCurrentUser = () => {
 
 export const getNewAccessToken = async () => {
   try {
-    const refreshToken = cookies().get('refreshToken')?.value;
+    const refreshToken = cookies().get("refreshToken")?.value;
 
     const res = await axiosInstance({
-      url: '/auth/refresh-token',
-      method: 'POST',
+      url: "/auth/refresh-token",
+      method: "POST",
       withCredentials: true,
       headers: {
         cookie: `refreshToken=${refreshToken}`,
@@ -169,15 +169,15 @@ export const getNewAccessToken = async () => {
 
     return res.data;
   } catch (error: any) {
-    throw new Error('Failed to get new access token');
+    throw new Error("Failed to get new access token");
   }
 };
 
 export const updateMyProfile = async (formData: FormData): Promise<any> => {
   try {
-    const { data } = await axiosInstance.put('/users/profile', formData, {
+    const { data } = await axiosInstance.put("/users/profile", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
 
@@ -190,7 +190,7 @@ export const updateMyProfile = async (formData: FormData): Promise<any> => {
 // get user stats
 export const getUserStats = async () => {
   try {
-    const { data } = await axiosInstance.get('/users/user-stats');
+    const { data } = await axiosInstance.get("/users/user-stats");
     return data;
   } catch (error: any) {
     throw new Error(error);
@@ -201,7 +201,7 @@ export const createTopGardener = async (payload: {
   user: string;
 }): Promise<any> => {
   try {
-    const { data } = await axiosInstance.post('/users/top-gardeners', payload);
+    const { data } = await axiosInstance.post("/users/top-gardeners", payload);
 
     return data;
   } catch (error: any) {

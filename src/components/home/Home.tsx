@@ -1,15 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-
-import Container from '@/src/components/Container';
 import { useGetAllPosts, useGetAllSharePosts } from '@/src/hooks/post.hook';
-import Loading from '@/src/components/UI/Loading';
 import RightSection from '@/src/components/sharred/RightSection';
 import { ICategory, IPost } from '@/src/types';
 import PostCard from '@/src/components/home/PostCard';
 import { useSearchParams } from 'next/navigation';
-import SkeletonLoading from '@/src/components/UI/SkeletonLoading';
 import PostsNotFound from '@/src/components/home/NotFoundPost';
 import { Button } from '@nextui-org/button';
 import { useGetAllCategories } from '@/src/hooks/category.hook';
@@ -36,11 +32,14 @@ const Home = () => {
   const searchParams = useSearchParams();
   const value = searchParams.get('search');
   const { data: categoriesData } = useGetAllCategories();
-  const { data: sharePosts } = useGetAllSharePosts();
   const [postDataLoading, setPostDataLoading] = useState(true);
+
   useEffect(() => {
     if (value) {
       setSearchTerm(value);
+    } else {
+      setSearchTerm('');
+      setPage(1);
     }
   }, [value]);
 
@@ -69,34 +68,37 @@ const Home = () => {
     // <Container>
     <>
       {/* category section */}
-      <div className="flex flex-wrap mt-[110px] lg:mt-0 mb-4 gap-4 w-full lg:w-9/12 justify-center">
-        <Button
-          className={
-            !categoryValue
-              ? 'bg-primary text-white hover:bg-green-700'
-              : 'bg-gray-100 hover:bg-gray-200'
-          }
-          onClick={() => setCategoryValue('')}
-        >
-          All
-        </Button>
-        {categoriesData?.data?.data?.map((item: ICategory, index: number) => (
-          <Button
-            key={index}
-            className={
-              categoryValue === item._id
-                ? 'bg-primary text-white hover:bg-green-700'
-                : 'bg-gray-100 hover:bg-gray-200'
-            }
-            onClick={() => handleCategoryValue(item._id)}
-          >
-            {' '}
-            {item.name}
-          </Button>
-        ))}
-      </div>
-      <div className="flex">
-        <div className=" w-full lg:w-9/12">
+
+      <div className="flex mt-[110px] lg:mt-0 items-start gap-8">
+        <div className=" w-full mx-auto lg:w-8/12 xl:9/12">
+          <div className="flex flex-wrap md:mb-8 mb-4 gap-4 w-full  ">
+            <Button
+              className={
+                !categoryValue
+                  ? 'bg-primary text-white hover:bg-green-700'
+                  : 'bg-gray-100 hover:bg-gray-200'
+              }
+              onClick={() => setCategoryValue('')}
+            >
+              All
+            </Button>
+            {categoriesData?.data?.data?.map(
+              (item: ICategory, index: number) => (
+                <Button
+                  key={index}
+                  className={
+                    categoryValue === item._id
+                      ? 'bg-primary text-white hover:bg-green-700'
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  }
+                  onClick={() => handleCategoryValue(item._id)}
+                >
+                  {' '}
+                  {item.name}
+                </Button>
+              )
+            )}
+          </div>
           {allPosts?.length > 0 ? (
             allPosts?.map((post: IPost) => (
               <PostCard key={post._id} item={post} />
@@ -117,7 +119,7 @@ const Home = () => {
             </div>
           )}
         </div>
-        <div className="lg:w-3/12 hidden lg:block">
+        <div className="lg:w-4/12 md:mt-10 xl:3/12 hidden lg:block">
           <RightSection />
         </div>
       </div>

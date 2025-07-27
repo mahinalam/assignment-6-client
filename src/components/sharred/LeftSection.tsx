@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import NavComponent from './NavComponent';
-
 import Link from 'next/link';
 import { useUser } from '@/src/context/user.provider';
 import { Input } from '@nextui-org/input';
@@ -23,11 +22,9 @@ import VerificationModal from '../modal/VerificationModal';
 import { useDisclosure } from '@nextui-org/modal';
 import { GoMoveToTop } from 'react-icons/go';
 import { useQueryClient } from '@tanstack/react-query';
-import LeftSectionSkeleton from '../UI/LeftSkeleton';
 
 const LeftSection = () => {
   const { user, setIsLoading, setUser } = useUser();
-
   const [activeTab, setActiveTab] = useState('home');
   const [searchValue, setSearchValue] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -54,35 +51,38 @@ const LeftSection = () => {
     user?._id as string
   );
   const queryClient = useQueryClient();
-  useEffect(() => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-
-    if (searchValue.trim()) {
-      current.set('search', searchValue.trim());
-    } else {
-      current.delete('search');
-    }
-
-    const query = current.toString();
-
-    // ✅ Stay on the current page, just update the query string
-    router.push(query ? `${pathname}?${query}` : pathname);
-  }, [searchValue]);
 
   const isLoginOrSignUp = pathname === '/login' || pathname === '/register';
 
-  // Clear search handler (optional: guard pathname here too)
-  const clearSearch = () => {
-    setSearchValue('');
-    if (pathname === '/') {
+  // search fn
+  const handleSearch = (value: string) => {
+    setSearchValue(value);
+    const trimmed = value.trim();
+
+    if (trimmed) {
+      router.push(`/?search=${trimmed}`);
+    } else {
       router.push('/');
     }
   };
+
+  // Clear search handler (optional: guard pathname here too)
+
+  const clearSearch = () => {
+    setSearchValue('');
+
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    params.delete('search');
+
+    const query = params.toString();
+    const newUrl = query ? `${pathname}?${query}` : pathname;
+
+    router.push(newUrl);
+  };
   const handleLogout = async () => {
     setIsLoading(true);
-
+    queryClient.invalidateQueries({ queryKey: ['SINGLE_USER', user?._id] });
     await logout();
-    // setUser(null);
     toast.success(`${user?.name} logged out successfully!`);
     router.push('/login');
   };
@@ -93,7 +93,10 @@ const LeftSection = () => {
     await verifyProfile();
     if (isSuccess) {
       queryClient.invalidateQueries({
-        queryKey: ['USER', user?._id, 'PAYMENT'],
+        queryKey: ['SINGLE_USER', user?._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['PAYMENT'],
       });
       setVerifyLoading(false);
       onVerificationModalOpenChange();
@@ -115,7 +118,7 @@ const LeftSection = () => {
           type="text"
           placeholder="Search posts..."
           value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           className="rounded mb-3 w-full ml-auto placeholder:text-green-600"
           size="lg"
           startContent={<CiSearch size={20} />}
